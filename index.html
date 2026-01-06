@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.2)</title>
+  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.3)</title>
   <style>
     :root{
       --bg1:#070b16;
@@ -145,6 +145,7 @@
       top:12px; left:12px; right:12px;
       display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
       pointer-events:none;
+      z-index: 50;
     }
     .caseBadge{
       display:inline-flex;
@@ -176,6 +177,7 @@
       height:200px;
       filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
       transform-origin: 50% 100%;
+      z-index: 20;
     }
     .lawyer{left:18px}
     .client{right:18px}
@@ -211,7 +213,7 @@
       .roleTag{font-size:11.5px}
     }
 
-    /* Judge */
+    /* Judge wrap + manner effects */
     .judgeWrap{
       position:absolute;
       left:50%;
@@ -221,6 +223,7 @@
       height:240px;
       pointer-events:none;
       filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
+      z-index: 25;
     }
     .judge{
       position:absolute;
@@ -229,6 +232,22 @@
       top:10px;
       width:210px;
       height:220px;
+      transform-origin: 50% 65%;
+    }
+    .judgeNod{ animation: nod .55s ease; }
+    @keyframes nod{
+      0%{transform: translateX(-50%) rotate(0deg) translateY(0)}
+      40%{transform: translateX(-50%) rotate(0deg) translateY(3px)}
+      70%{transform: translateX(-50%) rotate(0deg) translateY(-1px)}
+      100%{transform: translateX(-50%) rotate(0deg) translateY(0)}
+    }
+    .judgeShake{ animation: shake .55s ease; }
+    @keyframes shake{
+      0%{transform: translateX(-50%) rotate(0deg)}
+      25%{transform: translateX(-50%) rotate(-3deg)}
+      50%{transform: translateX(-50%) rotate(3deg)}
+      75%{transform: translateX(-50%) rotate(-2deg)}
+      100%{transform: translateX(-50%) rotate(0deg)}
     }
 
     /* Gavel */
@@ -242,6 +261,7 @@
       opacity:.95;
       filter: drop-shadow(0 14px 18px rgba(0,0,0,.35));
       pointer-events:none;
+      z-index: 30;
     }
     .gavel.tap{animation: gavelTap .42s ease}
     @keyframes gavelTap{
@@ -250,7 +270,6 @@
       65%{transform: rotate(10deg) translateY(2px)}
       100%{transform: rotate(0deg) translateY(0)}
     }
-    /* Gavel spark */
     .gavelSpark{
       position:absolute;
       right:42px;
@@ -261,68 +280,13 @@
       box-shadow: 0 0 18px rgba(255,214,106,.85);
       opacity:0;
       pointer-events:none;
+      z-index: 31;
     }
     .gavelSpark.show{animation: spark .32s ease}
     @keyframes spark{
       0%{opacity:0; transform: scale(.6)}
       35%{opacity:1; transform: scale(1.8)}
       100%{opacity:0; transform: scale(2.2)}
-    }
-
-    /* Verdict screen */
-    .verdictScreen{
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(700px 300px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.52), rgba(0,0,0,.78));
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:14px;
-      z-index: 30;
-    }
-    .verdictScreen.show{display:flex}
-    .verdictCard{
-      width:min(680px, 96%);
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(15,20,40,.62);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 22px 50px rgba(0,0,0,.45);
-      overflow:hidden;
-      position:relative;
-    }
-    .verdictTop{
-      padding:14px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .verdictTop h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px}
-    .verdictTop p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
-    .verdictBody{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:grid;gap:10px}
-    .feedbackBox{
-      padding:12px;border-radius: 16px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      font-size:12.5px;
-      line-height:1.4;
-    }
-    .verdictActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:14px; border-top:1px solid rgba(255,255,255,.10)}
-    .sealCorner{
-      position:absolute;
-      right:14px;
-      bottom:64px;
-      width:86px;
-      height:86px;
-      opacity:.92;
-      filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
-      pointer-events:none;
-      transform: rotate(-8deg);
     }
 
     /* Scene stamp with seal */
@@ -340,8 +304,9 @@
       text-transform: uppercase;
       display:none;
       box-shadow: 0 18px 40px rgba(0,0,0,.35);
-      z-index: 10;
+      z-index: 70;
       width:min(360px, 92%);
+      pointer-events:none;
     }
     .stampRow{
       display:flex;
@@ -359,51 +324,59 @@
       65%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1.06)}
       100%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1)}
     }
-    .seal{
-      width:74px;height:74px; flex:0 0 auto;
-      opacity:.95;
-    }
+    .seal{ width:74px;height:74px; flex:0 0 auto; opacity:.95; }
 
     /* Confetti */
-    .confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; display:none; z-index: 11;}
+    .confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; display:none; z-index: 72;}
     .confetti.show{display:block}
     .confetti i{position:absolute; top:-10%; width:10px; height:16px; border-radius: 3px; opacity:.92; animation: fall 1.15s linear forwards;}
     @keyframes fall{0%{transform: translateY(-10vh) rotate(0deg); opacity:1} 100%{transform: translateY(120vh) rotate(260deg); opacity:.88}}
 
-    /* Custody (more impressive) */
-    .custodyOverlay{
+    /* Bail: client walks out */
+    .client.walkOut{ animation: walkOut 1.1s ease forwards; }
+    @keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-18px) scale(1.02)} 100%{transform: translateX(-180px) scale(1.02); opacity:0}}
+    @media (max-width:520px){@keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-14px) scale(1.02)} 100%{transform: translateX(-140px) scale(1.02); opacity:0}}}
+
+    /* ===== CAGE EFFECT (replaces cops/handcuffs) ===== */
+    .cageWrap{
       position:absolute;
-      right:10px;
-      bottom:72px;
-      width:220px;
-      height:250px;
+      right:6px;
+      bottom:66px;
+      width:250px;
+      height:280px;
       pointer-events:none;
       opacity:0;
-      transform: translateX(26px);
-      z-index: 12;
+      transform: translateY(-18px) scale(.98);
+      z-index: 80;
     }
-    @media (max-width:520px){.custodyOverlay{width:190px;height:230px; right:4px}}
-    .custodyOverlay.show{
+    @media (max-width:520px){.cageWrap{width:210px;height:250px; right:2px}}
+    .cageWrap.show{
       opacity:1;
-      transform: translateX(0);
-      animation: custodyIn .38s ease;
+      transform: translateY(0) scale(1);
+      animation: cageIn .28s ease;
     }
-    @keyframes custodyIn{from{opacity:0; transform: translateX(30px) scale(.98)} to{opacity:1; transform: translateX(0) scale(1)}}
+    @keyframes cageIn{from{opacity:0; transform: translateY(-18px) scale(.98)} to{opacity:1; transform: translateY(0) scale(1)}}
 
-    /* siren flash */
-    .sirenFlash{
+    .cageFrame{
       position:absolute; inset:0;
       border-radius: 22px;
-      opacity:0;
+      background: rgba(0,0,0,.34);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 44px rgba(0,0,0,.46);
+      overflow:hidden;
+    }
+
+    /* flashing warning light */
+    .cageFlash{
+      position:absolute; inset:0;
       background:
-        radial-gradient(220px 180px at 25% 15%, rgba(60,150,255,.22), transparent 55%),
-        radial-gradient(220px 180px at 75% 15%, rgba(255,80,110,.22), transparent 55%);
+        radial-gradient(240px 180px at 25% 15%, rgba(60,150,255,.22), transparent 55%),
+        radial-gradient(240px 180px at 75% 15%, rgba(255,80,110,.22), transparent 55%);
+      opacity:0;
       pointer-events:none;
       mix-blend-mode: screen;
     }
-    .custodyOverlay.show .sirenFlash{
-      animation: siren 1.2s ease-in-out 1;
-    }
+    .cageWrap.show .cageFlash{ animation: siren 1.15s ease-in-out 1; }
     @keyframes siren{
       0%{opacity:0}
       15%{opacity:1}
@@ -414,111 +387,59 @@
       100%{opacity:0}
     }
 
-    .barsFrame{
-      position:absolute; inset:0;
-      border-radius: 22px;
-      background: rgba(0,0,0,.34);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 18px 40px rgba(0,0,0,.42);
-      overflow:hidden;
-    }
-    .bars{
+    /* bars drop */
+    .cageBars{
       position:absolute; inset:0;
       background:
         repeating-linear-gradient(
           90deg,
-          rgba(255,255,255,.18) 0,
-          rgba(255,255,255,.18) 8px,
-          rgba(0,0,0,.22) 8px,
-          rgba(0,0,0,.22) 20px
+          rgba(255,255,255,.20) 0,
+          rgba(255,255,255,.20) 9px,
+          rgba(0,0,0,.22) 9px,
+          rgba(0,0,0,.22) 22px
         );
-      opacity:.82;
+      opacity:.84;
       transform: translateY(-120%);
     }
-    .custodyOverlay.show .bars{animation: barsDrop .55s cubic-bezier(.2,.85,.2,1) forwards;}
+    .cageWrap.show .cageBars{
+      animation: barsDrop .55s cubic-bezier(.2,.85,.2,1) forwards;
+    }
     @keyframes barsDrop{to{transform: translateY(0)}}
 
-    /* escort silhouettes */
-    .escort{
-      position:absolute;
-      left:0; right:0;
-      bottom:54px;
-      height:120px;
-      opacity:0;
-      transform: translateX(18px);
-      pointer-events:none;
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      padding:0 10px;
-      gap:8px;
-    }
-    .custodyOverlay.show .escort{
-      opacity:1;
-      transform: translateX(0);
-      animation: escortIn .55s ease forwards;
-    }
-    @keyframes escortIn{
-      0%{opacity:0; transform: translateX(22px)}
-      100%{opacity:1; transform: translateX(0)}
-    }
-    .cop{
-      width:54px; height:110px;
-      border-radius: 18px;
-      background:
-        radial-gradient(circle at 40% 20%, rgba(255,255,255,.18), transparent 55%),
-        linear-gradient(180deg, rgba(70,120,255,.55), rgba(10,10,18,.75));
+    /* top rail + lock */
+    .cageTop{
+      position:absolute; left:10px; right:10px; top:10px;
+      height:20px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
-      position:relative;
-      box-shadow: 0 10px 18px rgba(0,0,0,.25);
+      box-shadow: 0 12px 20px rgba(0,0,0,.24);
+      opacity:.9;
     }
-    .cop:before{
-      content:"";
-      position:absolute;
-      left:50%; top:10px;
-      width:24px; height:24px;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      background: rgba(240,240,255,.35);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .cop:after{
-      content:"";
-      position:absolute;
-      left:50%; top:38px;
-      width:34px; height:12px;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      background: rgba(255,214,106,.35);
-      border:1px solid rgba(255,255,255,.10);
-      opacity:.8;
-    }
-
-    .cuffs{
+    .lock{
       position:absolute;
       left:50%;
-      bottom:18px;
-      transform: translateX(-50%);
-      width:72px;height:34px;
+      top:26px;
+      transform: translateX(-50%) scale(.7);
       opacity:0;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.30));
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
     }
-    .custodyOverlay.show .cuffs{
+    .cageWrap.show .lock{
       opacity:1;
-      animation: cuffsPop .55s ease .12s forwards;
+      animation: lockPop .48s ease .22s forwards;
     }
-    @keyframes cuffsPop{
-      0%{transform: translateX(-50%) scale(.6); opacity:0}
-      60%{transform: translateX(-50%) scale(1.15); opacity:1}
-      100%{transform: translateX(-50%) scale(1); opacity:1}
+    @keyframes lockPop{
+      0%{transform: translateX(-50%) scale(.55); opacity:0}
+      60%{transform: translateX(-50%) scale(1.05); opacity:1}
+      100%{transform: translateX(-50%) scale(.95); opacity:1}
     }
 
-    .custodyTag{
+    .cageTag{
       position:absolute; left:12px; right:12px; bottom:12px;
       padding:10px 12px;
       border-radius: 16px;
       border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.45);
+      background: rgba(0,0,0,.50);
       color: rgba(255,93,108,.95);
       font-weight:950;
       text-transform: uppercase;
@@ -526,7 +447,7 @@
       font-size: 12px;
       text-align:center;
     }
-    .custodySmall{
+    .cageSmall{
       position:absolute;
       left:12px; right:12px;
       bottom:46px;
@@ -541,10 +462,31 @@
       opacity:.95;
     }
 
-    /* Bail: client walks out */
-    .client.walkOut{ animation: walkOut 1.1s ease forwards; }
-    @keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-18px) scale(1.02)} 100%{transform: translateX(-180px) scale(1.02); opacity:0}}
-    @media (max-width:520px){@keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-14px) scale(1.02)} 100%{transform: translateX(-140px) scale(1.02); opacity:0}}}
+    /* CLANG text */
+    .clang{
+      position:absolute;
+      left:50%;
+      top:36%;
+      transform: translate(-50%,-50%) scale(.7);
+      opacity:0;
+      padding:8px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.45);
+      font-weight:950;
+      letter-spacing: 1px;
+      color: rgba(255,214,106,.9);
+      z-index: 85;
+      pointer-events:none;
+    }
+    .cageWrap.show .clang{
+      animation: clangPop .55s ease .16s forwards;
+    }
+    @keyframes clangPop{
+      0%{opacity:0; transform: translate(-50%,-50%) scale(.7)}
+      45%{opacity:1; transform: translate(-50%,-50%) scale(1.05)}
+      100%{opacity:0; transform: translate(-50%,-50%) scale(1.18)}
+    }
 
     /* Quiz panel */
     .quiz{
@@ -558,7 +500,7 @@
         linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.28));
       backdrop-filter: blur(10px);
       padding:12px;
-      z-index: 20;
+      z-index: 90;
     }
     .quizTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;}
     .quizTop h2{margin:0;font-size:14px;font-weight:950;letter-spacing:.2px}
@@ -627,6 +569,62 @@
     .opt.correct{border-color: rgba(49,208,124,.75); background: rgba(49,208,124,.10)}
     .opt.wrong{border-color: rgba(255,93,108,.75); background: rgba(255,93,108,.10)}
 
+    /* Verdict screen */
+    .verdictScreen{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(700px 300px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.52), rgba(0,0,0,.78));
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      z-index: 120;
+    }
+    .verdictScreen.show{display:flex}
+    .verdictCard{
+      width:min(680px, 96%);
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(15,20,40,.62);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 22px 50px rgba(0,0,0,.45);
+      overflow:hidden;
+      position:relative;
+    }
+    .verdictTop{
+      padding:14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .verdictTop h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px}
+    .verdictTop p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
+    .verdictBody{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:grid;gap:10px}
+    .feedbackBox{
+      padding:12px;border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size:12.5px;
+      line-height:1.4;
+    }
+    .verdictActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:14px; border-top:1px solid rgba(255,255,255,.10)}
+    .sealCorner{
+      position:absolute;
+      right:14px;
+      bottom:64px;
+      width:86px;
+      height:86px;
+      opacity:.92;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
+      pointer-events:none;
+      transform: rotate(-8deg);
+    }
+
     /* Intro overlay */
     .intro{
       position:absolute; inset:0;
@@ -634,7 +632,7 @@
       align-items:center;
       justify-content:center;
       padding:14px;
-      z-index: 40;
+      z-index: 130;
       background:
         radial-gradient(800px 340px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.52), rgba(0,0,0,.80));
@@ -678,7 +676,7 @@
       backdrop-filter: blur(8px);
       font-weight:900;
       letter-spacing:.2px;
-      z-index: 100;
+      z-index: 200;
     }
     .toast.show{display:block; animation: toastIn .22s ease}
     @keyframes toastIn{from{opacity:0; transform: translateX(-50%) translateY(8px)} to{opacity:1; transform: translateX(-50%) translateY(0)}}
@@ -695,7 +693,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Courtroom Bail GBL</h1>
-          <p>Single-screen quiz + scene. One attempt per question.</p>
+          <p>IT Act quiz (single-screen). One attempt per question.</p>
         </div>
       </div>
 
@@ -722,7 +720,7 @@
           <!-- Judge + label -->
           <div class="judgeWrap" aria-hidden="true">
             <div class="roleTag judge">Judge <small>(Court)</small></div>
-            <svg class="judge" viewBox="0 0 220 240">
+            <svg class="judge" id="judgeSvg" viewBox="0 0 220 240">
               <defs>
                 <linearGradient id="jg_robe" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0" stop-color="#222433" stop-opacity=".98"/>
@@ -842,39 +840,35 @@
           </svg>
           <div class="gavelSpark" id="gavelSpark"></div>
 
-          <!-- Scene stamp (with seal) -->
+          <!-- Scene stamp -->
           <div class="stamp" id="stamp"></div>
 
           <div class="confetti" id="confetti"></div>
 
-          <!-- Custody overlay (upgraded) -->
-          <div class="custodyOverlay" id="custodyOverlay" aria-hidden="true">
-            <div class="barsFrame">
-              <div class="sirenFlash"></div>
-              <div class="bars"></div>
-              <div class="escort">
-                <div class="cop"></div>
-                <div class="cop" style="opacity:.85"></div>
-              </div>
+          <!-- CAGE overlay -->
+          <div class="cageWrap" id="cageWrap" aria-hidden="true">
+            <div class="clang">CLANG</div>
+            <div class="cageFrame">
+              <div class="cageFlash"></div>
+              <div class="cageTop"></div>
+              <div class="cageBars"></div>
 
-              <!-- handcuffs icon -->
-              <svg class="cuffs" viewBox="0 0 120 60">
+              <svg class="lock" viewBox="0 0 120 120" aria-hidden="true">
                 <defs>
-                  <linearGradient id="cu" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="rgba(255,255,255,.35)"/>
-                    <stop offset="1" stop-color="rgba(255,255,255,.12)"/>
+                  <linearGradient id="lk" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="rgba(255,255,255,.30)"/>
+                    <stop offset="1" stop-color="rgba(255,255,255,.10)"/>
                   </linearGradient>
                 </defs>
-                <g fill="none" stroke="url(#cu)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M28 36 a18 18 0 1 1 36 0 a18 18 0 1 1 -36 0" />
-                  <path d="M56 36 h8" />
-                  <path d="M56 28 h12" />
-                  <path d="M72 36 a18 18 0 1 1 36 0 a18 18 0 1 1 -36 0" />
-                </g>
+                <path d="M40 54 v-8 a20 20 0 0 1 40 0 v8"
+                      fill="none" stroke="rgba(255,214,106,.55)" stroke-width="8" stroke-linecap="round"/>
+                <rect x="34" y="54" width="52" height="50" rx="14" fill="rgba(0,0,0,.25)" stroke="url(#lk)" stroke-width="3"/>
+                <circle cx="60" cy="78" r="7" fill="rgba(255,214,106,.55)"/>
+                <rect x="57" y="82" width="6" height="14" rx="3" fill="rgba(255,214,106,.55)"/>
               </svg>
 
-              <div class="custodySmall">Escorted to lock-up</div>
-              <div class="custodyTag">Judicial Custody</div>
+              <div class="cageSmall">Remand executed</div>
+              <div class="cageTag">Judicial Custody</div>
             </div>
           </div>
 
@@ -925,7 +919,6 @@
             <div class="feedbackBox" id="verdictFeedback">Feedback appears here.</div>
           </div>
 
-          <!-- Corner seal -->
           <svg class="sealCorner" viewBox="0 0 120 120" aria-hidden="true">
             <defs>
               <radialGradient id="sg" cx=".35" cy=".35" r=".75">
@@ -947,13 +940,13 @@
         </div>
       </div>
 
-      <!-- Intro overlay (teacher note removed) -->
+      <!-- Intro overlay -->
       <div class="intro" id="intro">
         <div class="introCard">
           <div class="introTop">
             <h2>Bail or Custody</h2>
             <p>
-              You are the defence lawyer. Each hearing has one MCQ based on the chapter.
+              You are the defence lawyer. Each hearing has one MCQ based on the IT Act chapter.
               Correct grants bail; wrong sends the client to custody. Aim for maximum bails.
             </p>
           </div>
@@ -962,7 +955,7 @@
               <b>Rules</b><br/>
               • One attempt per question (no appeal).<br/>
               • Correct: +10 points and bail granted.<br/>
-              • Wrong: 0 points and custody animation.<br/>
+              • Wrong: 0 points and custody executed (cage lock).<br/>
               • Scene + MCQ stay on the same screen for smartphones.
             </div>
           </div>
@@ -981,80 +974,157 @@
     // ===== CONFIG =====
     const TOTAL_CASES = 10;
 
-    // Replace with your chapter-based MCQs.
+    // MCQs derived from the uploaded IT Act chapter.
+    // Source: IT Security ACT.docx :contentReference[oaicite:1]{index=1}
     const QUESTION_BANK = [
       {
-        id: "CH-Q1",
-        topic: "Foundations",
+        id: "ITACT-Q1",
+        topic: "Overview",
         difficulty: 1,
-        brief: "The accused requests bail. The judge tests your grasp of core security objectives.",
-        q: "Which statement best describes the primary goal of information security?",
+        brief: "The judge asks a basic fact about the IT Act.",
+        q: "The Information Technology Act, 2000 came into force on:",
+        choices: ["17 Oct 2000", "15 Aug 2000", "26 Jan 2001", "23 Dec 2008"],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter states the Act came into force on 17 Oct 2000.",
+        feedbackWrong: "Incorrect. The chapter mentions 17 Oct 2000 as the enforcement date."
+      },
+      {
+        id: "ITACT-Q2",
+        topic: "Structure",
+        difficulty: 1,
+        brief: "The court checks your knowledge of the Act’s structure.",
+        q: "The IT Act, 2000 consists of:",
+        choices: ["13 Chapters and 94 sections", "10 Chapters and 100 sections", "14 Chapters and 80 sections", "12 Chapters and 96 sections"],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter notes 13 Chapters divided into 94 sections.",
+        feedbackWrong: "Incorrect. The chapter states 13 Chapters divided into 94 sections."
+      },
+      {
+        id: "ITACT-Q3",
+        topic: "Applicability",
+        difficulty: 2,
+        brief: "The judge asks where the Act applies.",
+        q: "The IT Act extends to:",
         choices: [
-          "Ensure confidentiality, integrity, and availability of information",
-          "Increase internet speed and reduce latency",
-          "Replace passwords with biometrics in all systems",
-          "Eliminate all risk by blocking network access"
+          "Whole of India including Jammu and Kashmir",
+          "Only metropolitan cities",
+          "Only Union Territories",
+          "Only states excluding Jammu and Kashmir"
         ],
         answerIndex: 0,
-        feedbackCorrect: "Correct. The CIA triad (confidentiality, integrity, availability) is a standard framing of information security goals.",
-        feedbackWrong: "Not correct. The fundamental goal is not speed or absolute risk removal; it is commonly framed using confidentiality, integrity, and availability."
+        feedbackCorrect: "Correct. The chapter explicitly includes Jammu and Kashmir.",
+        feedbackWrong: "Incorrect. The chapter says it extends to the whole of India including Jammu and Kashmir."
       },
       {
-        id: "CH-Q2",
-        topic: "Threats",
-        difficulty: 1,
-        brief: "The prosecution cites a suspicious email trail. The judge asks about common attack intent.",
-        q: "A phishing email mainly attempts to:",
+        id: "ITACT-Q4",
+        topic: "Extra-territorial reach",
+        difficulty: 2,
+        brief: "A cross-border scenario is raised in court.",
+        q: "The Act can apply to offences committed outside India if:",
         choices: [
-          "Physically damage computer hardware",
-          "Trick users into revealing sensitive information",
-          "Upgrade the operating system automatically",
-          "Encrypt backups to improve recovery"
+          "The person is an Indian citizen only",
+          "The act involves a computer system/network located in India",
+          "A paper document exists as evidence",
+          "The offence is reported within 24 hours"
         ],
         answerIndex: 1,
-        feedbackCorrect: "Correct. Phishing is social engineering intended to deceive users into sharing credentials or sensitive data.",
-        feedbackWrong: "Not correct. Phishing focuses on deception and information theft, not hardware damage or system upgrades."
+        feedbackCorrect: "Correct. The chapter says applicability extends if the conduct involves a computer resource located in India.",
+        feedbackWrong: "Incorrect. The key condition is involvement of a computer/system/network located in India."
       },
       {
-        id: "CH-Q3",
-        topic: "Controls",
+        id: "ITACT-Q5",
+        topic: "Objects & Reasons",
         difficulty: 2,
-        brief: "The judge asks what control best reduces harm if a password is compromised.",
-        q: "Which control most directly reduces the impact of a compromised password?",
+        brief: "The judge asks the main purpose of the Act.",
+        q: "A primary objective of the IT Act, 2000 is to provide legal recognition for:",
         choices: [
-          "Multi-factor authentication (MFA)",
-          "Defragmenting the hard disk",
-          "Increasing screen brightness",
-          "Turning off all firewalls"
+          "Handwritten contracts only",
+          "Electronic records and electronic transactions",
+          "Only criminal trials in cybercrime cases",
+          "Only banking regulations"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. The chapter emphasizes legal recognition of electronic records/transactions.",
+        feedbackWrong: "Incorrect. The Act’s stated purpose includes legal recognition for electronic records and e-transactions."
+      },
+      {
+        id: "ITACT-Q6",
+        topic: "Exceptions",
+        difficulty: 3,
+        brief: "The prosecution challenges applicability of the Act to certain documents.",
+        q: "Which of the following is an exception where the IT Act does NOT apply (as per the chapter’s list)?",
+        choices: ["Will (testamentary disposition)", "Electronic records generally", "Digital signatures", "E-governance services"],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter lists 'Will' as an exception category.",
+        feedbackWrong: "Incorrect. The chapter lists 'Will' among the exceptions."
+      },
+      {
+        id: "ITACT-Q7",
+        topic: "Digital Signature",
+        difficulty: 2,
+        brief: "The judge checks your understanding of digital signatures in the Act.",
+        q: "In the chapter, 'Digital signature' is described as authentication of an electronic record by:",
+        choices: [
+          "A subscriber using an electronic method/procedure",
+          "A judge using court seal only",
+          "A network provider using firewall logs",
+          "A police officer using a warrant"
         ],
         answerIndex: 0,
-        feedbackCorrect: "Correct. MFA adds an additional verification factor so a password alone is insufficient.",
-        feedbackWrong: "Not correct. The relevant idea is adding an extra factor beyond the password."
+        feedbackCorrect: "Correct. The chapter’s definition links authentication by a subscriber via electronic method/procedure.",
+        feedbackWrong: "Incorrect. The definition refers to authentication by a subscriber via an electronic method/procedure."
       },
       {
-        id: "CH-Q4",
-        topic: "Malware",
-        difficulty: 2,
-        brief: "A device was locked and access was demanded for payment. The judge asks the correct term.",
-        q: "Ransomware is best described as malware that:",
+        id: "ITACT-Q8",
+        topic: "Amendment 2008",
+        difficulty: 3,
+        brief: "The court asks why amendments were needed.",
+        q: "According to the chapter, the 2008 amendment was needed mainly because:",
         choices: [
-          "Steals data silently without any visible effects",
-          "Encrypts files and demands payment to restore access",
-          "Only affects mobile devices and not computers",
-          "Improves system security by patching vulnerabilities"
+          "Cyber crime was not adequately addressed in the 2000 Act",
+          "The Act banned all e-commerce",
+          "Digital signatures were removed",
+          "All offences became non-bailable"
         ],
-        answerIndex: 1,
-        feedbackCorrect: "Correct. Ransomware commonly encrypts files and demands payment for decryption.",
-        feedbackWrong: "Not correct. The defining behavior is encryption plus extortion."
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter notes cyber crime gaps and rising incidents as a key reason.",
+        feedbackWrong: "Incorrect. The main reason described is that cyber crimes were not sufficiently addressed earlier."
+      },
+      {
+        id: "ITACT-Q9",
+        topic: "Section 43A",
+        difficulty: 3,
+        brief: "A data privacy negligence issue is raised.",
+        q: "Section 43A (as described) concerns liability of a body corporate when it is negligent in:",
+        choices: [
+          "Maintaining reasonable security practices leading to wrongful loss/gain",
+          "Providing free internet access to citizens",
+          "Publishing all contracts in paper form only",
+          "Running antivirus scans daily"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter states compensation liability for negligence in reasonable security practices.",
+        feedbackWrong: "Incorrect. The described liability is about negligence in reasonable security practices and resulting loss/gain."
+      },
+      {
+        id: "ITACT-Q10",
+        topic: "Investigation powers",
+        difficulty: 3,
+        brief: "The judge asks who can investigate/raid for cyber offences as per the chapter.",
+        q: "After amendment (as per the chapter), offences can be investigated and raids conducted by a police officer of at least the rank of:",
+        choices: ["Police Inspector", "Constable", "Superintendent of Police only", "Deputy Commissioner only"],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The chapter notes the rank lowered from DySP to Police Inspector (Section 78 amended).",
+        feedbackWrong: "Incorrect. The chapter states the amended rank is Police Inspector."
       }
     ];
 
     const CASE_TEMPLATES = [
       "The accused requests bail. The prosecution claims a risk of repeating the offence.",
       "The accused is a first-time offender. The court seeks clarity on a relevant concept.",
-      "Digital evidence is cited. You must respond using correct principles.",
+      "A legal-tech issue is cited. You must respond using the IT Act correctly.",
       "The judge tests your reasoning before granting bail.",
-      "A procedural concern is raised. Bail conditions must be justified with correct reasoning."
+      "A procedural concern is raised. Bail depends on your legal clarity."
     ];
 
     // ===== STATE =====
@@ -1102,10 +1172,13 @@
 
     const gavel = must("gavel");
     const gavelSpark = must("gavelSpark");
+
+    const judgeSvg = must("judgeSvg");
+
     const stamp = must("stamp");
     const confetti = must("confetti");
 
-    const custodyOverlay = must("custodyOverlay");
+    const cageWrap = must("cageWrap");
     const clientSvg = must("clientSvg");
 
     const verdictScreen = must("verdictScreen");
@@ -1117,7 +1190,7 @@
 
     const toast = must("toast");
 
-    // ===== SOUND (gavel effect) =====
+    // ===== SOUND =====
     let audioCtx = null;
     function ensureAudio(){
       if(!state.soundOn) return null;
@@ -1130,13 +1203,12 @@
       }
       return audioCtx;
     }
+
     function gavelSound(){
       const ctx = ensureAudio();
       if(!ctx) return;
 
       const now = ctx.currentTime;
-
-      // a short "thunk" + click: filtered noise + quick sine
       const o = ctx.createOscillator();
       const g = ctx.createGain();
       o.type = "sine";
@@ -1145,12 +1217,9 @@
       g.gain.setValueAtTime(0.0001, now);
       g.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.start(now);
-      o.stop(now + 0.10);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now); o.stop(now + 0.10);
 
-      // tiny hi-click
       const o2 = ctx.createOscillator();
       const g2 = ctx.createGain();
       o2.type = "triangle";
@@ -1158,10 +1227,32 @@
       g2.gain.setValueAtTime(0.0001, now);
       g2.gain.exponentialRampToValueAtTime(0.08, now + 0.005);
       g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
-      o2.connect(g2);
-      g2.connect(ctx.destination);
-      o2.start(now);
-      o2.stop(now + 0.04);
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.start(now); o2.stop(now + 0.04);
+    }
+
+    function cageClangSound(){
+      const ctx = ensureAudio();
+      if(!ctx) return;
+      const now = ctx.currentTime;
+
+      // metallic clang: two detuned sines + short decay
+      const o1 = ctx.createOscillator();
+      const o2 = ctx.createOscillator();
+      const g = ctx.createGain();
+
+      o1.type = "sine"; o2.type = "sine";
+      o1.frequency.setValueAtTime(520, now);
+      o2.frequency.setValueAtTime(610, now);
+
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+      o1.connect(g); o2.connect(g);
+      g.connect(ctx.destination);
+      o1.start(now); o2.start(now);
+      o1.stop(now + 0.26); o2.stop(now + 0.26);
     }
 
     // ===== HELPERS =====
@@ -1190,12 +1281,18 @@
       gavelSound();
     }
 
+    function judgeManner(correct){
+      judgeSvg.classList.remove("judgeNod","judgeShake");
+      void judgeSvg.offsetWidth;
+      judgeSvg.classList.add(correct ? "judgeNod" : "judgeShake");
+    }
+
     function resetSceneFX(){
       stamp.className = "stamp";
       stamp.innerHTML = "";
       confetti.className = "confetti";
       confetti.innerHTML = "";
-      custodyOverlay.classList.remove("show");
+      cageWrap.classList.remove("show");
       clientSvg.classList.remove("walkOut");
       clientSvg.style.opacity = "";
       clientSvg.style.transform = "";
@@ -1233,7 +1330,7 @@
     function popStamp(isGood){
       stamp.className = "stamp " + (isGood ? "good" : "bad") + " show";
       const big = isGood ? "BAIL GRANTED" : "JUDICIAL CUSTODY";
-      const sub = isGood ? "Order: Release on conditions" : "Order: Remand to custody";
+      const sub = isGood ? "Order: Release on conditions" : "Order: Remand executed";
       const seal = sealSVG("COURT", "SEAL");
       stamp.innerHTML = `
         <div class="stampRow">
@@ -1273,13 +1370,8 @@
       hudBails.textContent = String(state.bails);
     }
 
-    function genBrief(){
-      return CASE_TEMPLATES[state.index % CASE_TEMPLATES.length];
-    }
-
-    function pickQuestion(){
-      return QUESTION_BANK[state.index % QUESTION_BANK.length];
-    }
+    function genBrief(){ return CASE_TEMPLATES[state.index % CASE_TEMPLATES.length]; }
+    function pickQuestion(){ return QUESTION_BANK[state.index % QUESTION_BANK.length]; }
 
     function logAttempt(entry){
       state.attemptLog.push({ ts: new Date().toISOString(), ...entry });
@@ -1402,8 +1494,10 @@
       });
 
       tapGavel();
+      judgeManner(correct);
 
       let points = 0;
+
       if(correct){
         points = 10;
         state.score += points;
@@ -1419,13 +1513,16 @@
         verdictFeedback.textContent = state.current.feedbackCorrect;
       } else {
         points = 0;
-
         popStamp(false);
-        // stronger custody reveal
-        setTimeout(()=> custodyOverlay.classList.add("show"), 150);
+
+        // cage effect + metallic clang
+        setTimeout(()=>{
+          cageWrap.classList.add("show");
+          cageClangSound();
+        }, 140);
 
         verdictTitle.textContent = "Judicial Custody";
-        verdictLine.textContent = "Bail denied. Remand ordered.";
+        verdictLine.textContent = "Bail denied. Remand executed.";
         verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackWrong;
       }
@@ -1442,7 +1539,7 @@
       });
 
       updateHUD();
-      setTimeout(()=> showVerdictScreen(), 850);
+      setTimeout(()=> showVerdictScreen(), 900);
     }
 
     function goNext(){
@@ -1462,7 +1559,7 @@
       const payload = {
         meta: {
           game: "Courtroom Bail GBL",
-          version: "v2.2 (labels + seal + stronger custody + gavel sound)",
+          version: "v2.3 (IT Act MCQs + cage custody + judge manners)",
           totalCases: state.totalCases,
           exportedAt: new Date().toISOString()
         },
@@ -1477,7 +1574,6 @@
       state.soundOn = !state.soundOn;
       btnSound.textContent = "Sound: " + (state.soundOn ? "On" : "Off");
       showToast("Sound " + (state.soundOn ? "enabled" : "disabled"));
-      // if turning on, prime audio context on user gesture
       if(state.soundOn) ensureAudio();
     }
 
