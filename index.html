@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.3)</title>
+  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.4)</title>
   <style>
     :root{
       --bg1:#070b16;
@@ -250,7 +250,21 @@
       100%{transform: translateX(-50%) rotate(0deg)}
     }
 
-    /* Gavel */
+    /* Judge gavel arm (hammer effect) */
+    .judgeGavel{
+      transform-origin: 150px 150px;
+    }
+    .judgeGavel.strike{
+      animation: judgeStrike .45s ease;
+    }
+    @keyframes judgeStrike{
+      0%{transform: rotate(0deg) translateY(0)}
+      35%{transform: rotate(-14deg) translateY(-6px)}
+      70%{transform: rotate(10deg) translateY(2px)}
+      100%{transform: rotate(0deg) translateY(0)}
+    }
+
+    /* Gavel (also used as judgment strike) */
     .gavel{
       position:absolute;
       top:88px;
@@ -333,11 +347,11 @@
     @keyframes fall{0%{transform: translateY(-10vh) rotate(0deg); opacity:1} 100%{transform: translateY(120vh) rotate(260deg); opacity:.88}}
 
     /* Bail: client walks out */
-    .client.walkOut{ animation: walkOut 1.1s ease forwards; }
+    #clientSvg.walkOut{ animation: walkOut 1.3s ease forwards; }
     @keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-18px) scale(1.02)} 100%{transform: translateX(-180px) scale(1.02); opacity:0}}
     @media (max-width:520px){@keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-14px) scale(1.02)} 100%{transform: translateX(-140px) scale(1.02); opacity:0}}}
 
-    /* ===== CAGE EFFECT (replaces cops/handcuffs) ===== */
+    /* ===== CAGE EFFECT ===== */
     .cageWrap{
       position:absolute;
       right:6px;
@@ -366,7 +380,6 @@
       overflow:hidden;
     }
 
-    /* flashing warning light */
     .cageFlash{
       position:absolute; inset:0;
       background:
@@ -387,7 +400,6 @@
       100%{opacity:0}
     }
 
-    /* bars drop */
     .cageBars{
       position:absolute; inset:0;
       background:
@@ -402,11 +414,10 @@
       transform: translateY(-120%);
     }
     .cageWrap.show .cageBars{
-      animation: barsDrop .55s cubic-bezier(.2,.85,.2,1) forwards;
+      animation: barsDrop .65s cubic-bezier(.2,.85,.2,1) forwards;
     }
     @keyframes barsDrop{to{transform: translateY(0)}}
 
-    /* top rail + lock */
     .cageTop{
       position:absolute; left:10px; right:10px; top:10px;
       height:20px;
@@ -462,7 +473,6 @@
       opacity:.95;
     }
 
-    /* CLANG text */
     .clang{
       position:absolute;
       left:50%;
@@ -480,12 +490,12 @@
       pointer-events:none;
     }
     .cageWrap.show .clang{
-      animation: clangPop .55s ease .16s forwards;
+      animation: clangPop .70s ease .16s forwards;
     }
     @keyframes clangPop{
       0%{opacity:0; transform: translate(-50%,-50%) scale(.7)}
-      45%{opacity:1; transform: translate(-50%,-50%) scale(1.05)}
-      100%{opacity:0; transform: translate(-50%,-50%) scale(1.18)}
+      45%{opacity:1; transform: translate(-50%,-50%) scale(1.08)}
+      100%{opacity:0; transform: translate(-50%,-50%) scale(1.22)}
     }
 
     /* Quiz panel */
@@ -720,6 +730,7 @@
           <!-- Judge + label -->
           <div class="judgeWrap" aria-hidden="true">
             <div class="roleTag judge">Judge <small>(Court)</small></div>
+
             <svg class="judge" id="judgeSvg" viewBox="0 0 220 240">
               <defs>
                 <linearGradient id="jg_robe" x1="0" y1="0" x2="0" y2="1">
@@ -735,16 +746,25 @@
                   <stop offset="0" stop-color="#f5f5ff" stop-opacity=".98"/>
                   <stop offset="1" stop-color="#cfd2ee" stop-opacity=".86"/>
                 </linearGradient>
+                <linearGradient id="jg_wood" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="rgba(255,214,106,.60)"/>
+                  <stop offset="1" stop-color="rgba(255,214,106,.18)"/>
+                </linearGradient>
               </defs>
+
+              <!-- wig -->
               <path d="M60 52 C60 25, 160 25, 160 52
                        C170 60, 178 78, 170 96
                        C162 110, 58 110, 50 96
                        C40 78, 48 60, 60 52Z"
                     fill="url(#jg_wig)" opacity=".95"/>
+              <!-- face -->
               <circle cx="110" cy="78" r="32" fill="url(#jg_face)" stroke="rgba(0,0,0,.14)" stroke-width="1"/>
               <circle cx="98" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
               <circle cx="122" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
               <path d="M98 92 Q110 102 122 92" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
+
+              <!-- robe -->
               <path d="M70 112
                        C78 104, 92 98, 110 98
                        C128 98, 142 104, 150 112
@@ -752,6 +772,15 @@
                        C140 214, 80 214, 54 196Z"
                     fill="url(#jg_robe)" stroke="rgba(255,255,255,.08)" stroke-width="1.2"/>
               <rect x="86" y="140" width="48" height="8" rx="8" fill="rgba(255,214,106,.85)" opacity=".65"/>
+
+              <!-- Judge gavel in-hand (hammer effect) -->
+              <g id="judgeGavel" class="judgeGavel">
+                <rect x="140" y="134" width="34" height="18" rx="6"
+                      fill="url(#jg_wood)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+                <rect x="153" y="142" width="46" height="12" rx="10"
+                      fill="url(#jg_wood)" stroke="rgba(255,255,255,.10)" stroke-width="1"
+                      transform="rotate(32 153 142)"/>
+              </g>
             </svg>
           </div>
 
@@ -792,7 +821,7 @@
           </div>
 
           <!-- Client + label -->
-          <div class="char client" id="clientWrap" aria-hidden="true">
+          <div class="char client" aria-hidden="true">
             <div class="roleTag">Client <small>(Accused)</small></div>
             <svg id="clientSvg" viewBox="0 0 180 220" width="100%" height="100%">
               <defs>
@@ -826,7 +855,7 @@
             </svg>
           </div>
 
-          <!-- Gavel -->
+          <!-- UI gavel -->
           <svg class="gavel" id="gavel" viewBox="0 0 120 120" aria-hidden="true">
             <defs>
               <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
@@ -958,6 +987,11 @@
               • Wrong: 0 points and custody executed (cage lock).<br/>
               • Scene + MCQ stay on the same screen for smartphones.
             </div>
+            <div class="ruleBox">
+              <b>Player Comfort</b><br/>
+              Animations are intentionally slower so the learner can notice the court outcome.
+              You can tune speed from a single timing section in code.
+            </div>
           </div>
           <div class="introActions">
             <button class="btn primary" id="btnIntroStart">Start Hearings</button>
@@ -974,148 +1008,85 @@
     // ===== CONFIG =====
     const TOTAL_CASES = 10;
 
-    // MCQs derived from the uploaded IT Act chapter.
-    // Source: IT Security ACT.docx :contentReference[oaicite:1]{index=1}
+    // ===== TIMING (slower outcome so learners can feel Bail / Custody) =====
+    // You can tune these three values only.
+    const TIMING = {
+      judgeStrikeAfterMs: 220,   // when judge uses hammer after your selection
+      showOutcomeFxMs: 1600,     // keep Bail/Custody outcome visible before verdict overlay
+      enableNextAfterMs: 1400    // prevent rushing to the next question
+    };
+
+    // MCQs (as implemented)
     const QUESTION_BANK = [
-      {
-        id: "ITACT-Q1",
-        topic: "Overview",
-        difficulty: 1,
-        brief: "The judge asks a basic fact about the IT Act.",
-        q: "The Information Technology Act, 2000 came into force on:",
-        choices: ["17 Oct 2000", "15 Aug 2000", "26 Jan 2001", "23 Dec 2008"],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter states the Act came into force on 17 Oct 2000.",
-        feedbackWrong: "Incorrect. The chapter mentions 17 Oct 2000 as the enforcement date."
+      { id:"ITACT-Q1", topic:"Overview", difficulty:1, brief:"The judge asks a basic fact about the IT Act.",
+        q:"The Information Technology Act, 2000 came into force on:",
+        choices:["17 Oct 2000","15 Aug 2000","26 Jan 2001","23 Dec 2008"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. The chapter states the Act came into force on 17 Oct 2000.",
+        feedbackWrong:"Incorrect. The chapter mentions 17 Oct 2000 as the enforcement date."
       },
-      {
-        id: "ITACT-Q2",
-        topic: "Structure",
-        difficulty: 1,
-        brief: "The court checks your knowledge of the Act’s structure.",
-        q: "The IT Act, 2000 consists of:",
-        choices: ["13 Chapters and 94 sections", "10 Chapters and 100 sections", "14 Chapters and 80 sections", "12 Chapters and 96 sections"],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter notes 13 Chapters divided into 94 sections.",
-        feedbackWrong: "Incorrect. The chapter states 13 Chapters divided into 94 sections."
+      { id:"ITACT-Q2", topic:"Structure", difficulty:1, brief:"The court checks your knowledge of the Act’s structure.",
+        q:"The IT Act, 2000 consists of:",
+        choices:["13 Chapters and 94 sections","10 Chapters and 100 sections","14 Chapters and 80 sections","12 Chapters and 96 sections"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. The chapter notes 13 Chapters divided into 94 sections.",
+        feedbackWrong:"Incorrect. The chapter states 13 Chapters divided into 94 sections."
       },
-      {
-        id: "ITACT-Q3",
-        topic: "Applicability",
-        difficulty: 2,
-        brief: "The judge asks where the Act applies.",
-        q: "The IT Act extends to:",
-        choices: [
-          "Whole of India including Jammu and Kashmir",
-          "Only metropolitan cities",
-          "Only Union Territories",
-          "Only states excluding Jammu and Kashmir"
-        ],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter explicitly includes Jammu and Kashmir.",
-        feedbackWrong: "Incorrect. The chapter says it extends to the whole of India including Jammu and Kashmir."
+      { id:"ITACT-Q3", topic:"Applicability", difficulty:2, brief:"The judge asks where the Act applies.",
+        q:"The IT Act extends to:",
+        choices:["Whole of India including Jammu and Kashmir","Only metropolitan cities","Only Union Territories","Only states excluding Jammu and Kashmir"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. The chapter explicitly includes Jammu and Kashmir.",
+        feedbackWrong:"Incorrect. The chapter says it extends to the whole of India including Jammu and Kashmir."
       },
-      {
-        id: "ITACT-Q4",
-        topic: "Extra-territorial reach",
-        difficulty: 2,
-        brief: "A cross-border scenario is raised in court.",
-        q: "The Act can apply to offences committed outside India if:",
-        choices: [
-          "The person is an Indian citizen only",
-          "The act involves a computer system/network located in India",
-          "A paper document exists as evidence",
-          "The offence is reported within 24 hours"
-        ],
-        answerIndex: 1,
-        feedbackCorrect: "Correct. The chapter says applicability extends if the conduct involves a computer resource located in India.",
-        feedbackWrong: "Incorrect. The key condition is involvement of a computer/system/network located in India."
+      { id:"ITACT-Q4", topic:"Extra-territorial reach", difficulty:2, brief:"A cross-border scenario is raised in court.",
+        q:"The Act can apply to offences committed outside India if:",
+        choices:["The person is an Indian citizen only","The act involves a computer system/network located in India","A paper document exists as evidence","The offence is reported within 24 hours"],
+        answerIndex:1,
+        feedbackCorrect:"Correct. Applicability extends if it involves a computer resource located in India.",
+        feedbackWrong:"Incorrect. The key condition is involvement of a computer/system/network located in India."
       },
-      {
-        id: "ITACT-Q5",
-        topic: "Objects & Reasons",
-        difficulty: 2,
-        brief: "The judge asks the main purpose of the Act.",
-        q: "A primary objective of the IT Act, 2000 is to provide legal recognition for:",
-        choices: [
-          "Handwritten contracts only",
-          "Electronic records and electronic transactions",
-          "Only criminal trials in cybercrime cases",
-          "Only banking regulations"
-        ],
-        answerIndex: 1,
-        feedbackCorrect: "Correct. The chapter emphasizes legal recognition of electronic records/transactions.",
-        feedbackWrong: "Incorrect. The Act’s stated purpose includes legal recognition for electronic records and e-transactions."
+      { id:"ITACT-Q5", topic:"Objects & Reasons", difficulty:2, brief:"The judge asks the main purpose of the Act.",
+        q:"A primary objective of the IT Act, 2000 is to provide legal recognition for:",
+        choices:["Handwritten contracts only","Electronic records and electronic transactions","Only criminal trials in cybercrime cases","Only banking regulations"],
+        answerIndex:1,
+        feedbackCorrect:"Correct. The Act recognizes electronic records and electronic transactions.",
+        feedbackWrong:"Incorrect. The Act’s purpose includes recognition for electronic records and e-transactions."
       },
-      {
-        id: "ITACT-Q6",
-        topic: "Exceptions",
-        difficulty: 3,
-        brief: "The prosecution challenges applicability of the Act to certain documents.",
-        q: "Which of the following is an exception where the IT Act does NOT apply (as per the chapter’s list)?",
-        choices: ["Will (testamentary disposition)", "Electronic records generally", "Digital signatures", "E-governance services"],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter lists 'Will' as an exception category.",
-        feedbackWrong: "Incorrect. The chapter lists 'Will' among the exceptions."
+      { id:"ITACT-Q6", topic:"Exceptions", difficulty:3, brief:"The prosecution challenges applicability of the Act to certain documents.",
+        q:"Which of the following is an exception where the IT Act does NOT apply?",
+        choices:["Will (testamentary disposition)","Electronic records generally","Digital signatures","E-governance services"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. A 'Will' is listed as an exception category.",
+        feedbackWrong:"Incorrect. The chapter lists 'Will' among the exceptions."
       },
-      {
-        id: "ITACT-Q7",
-        topic: "Digital Signature",
-        difficulty: 2,
-        brief: "The judge checks your understanding of digital signatures in the Act.",
-        q: "In the chapter, 'Digital signature' is described as authentication of an electronic record by:",
-        choices: [
-          "A subscriber using an electronic method/procedure",
-          "A judge using court seal only",
-          "A network provider using firewall logs",
-          "A police officer using a warrant"
-        ],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter’s definition links authentication by a subscriber via electronic method/procedure.",
-        feedbackWrong: "Incorrect. The definition refers to authentication by a subscriber via an electronic method/procedure."
+      { id:"ITACT-Q7", topic:"Digital Signature", difficulty:2, brief:"The judge checks your understanding of digital signatures.",
+        q:"In the chapter, 'Digital signature' is described as authentication of an electronic record by:",
+        choices:["A subscriber using an electronic method/procedure","A judge using court seal only","A network provider using firewall logs","A police officer using a warrant"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. Authentication is by a subscriber via electronic method/procedure.",
+        feedbackWrong:"Incorrect. It refers to authentication by a subscriber via an electronic method/procedure."
       },
-      {
-        id: "ITACT-Q8",
-        topic: "Amendment 2008",
-        difficulty: 3,
-        brief: "The court asks why amendments were needed.",
-        q: "According to the chapter, the 2008 amendment was needed mainly because:",
-        choices: [
-          "Cyber crime was not adequately addressed in the 2000 Act",
-          "The Act banned all e-commerce",
-          "Digital signatures were removed",
-          "All offences became non-bailable"
-        ],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter notes cyber crime gaps and rising incidents as a key reason.",
-        feedbackWrong: "Incorrect. The main reason described is that cyber crimes were not sufficiently addressed earlier."
+      { id:"ITACT-Q8", topic:"Amendment 2008", difficulty:3, brief:"The court asks why amendments were needed.",
+        q:"According to the chapter, the 2008 amendment was needed mainly because:",
+        choices:["Cyber crime was not adequately addressed in the 2000 Act","The Act banned all e-commerce","Digital signatures were removed","All offences became non-bailable"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. It was needed because cyber crimes were not sufficiently addressed earlier.",
+        feedbackWrong:"Incorrect. The key reason described is cyber crimes were not adequately addressed earlier."
       },
-      {
-        id: "ITACT-Q9",
-        topic: "Section 43A",
-        difficulty: 3,
-        brief: "A data privacy negligence issue is raised.",
-        q: "Section 43A (as described) concerns liability of a body corporate when it is negligent in:",
-        choices: [
-          "Maintaining reasonable security practices leading to wrongful loss/gain",
-          "Providing free internet access to citizens",
-          "Publishing all contracts in paper form only",
-          "Running antivirus scans daily"
-        ],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter states compensation liability for negligence in reasonable security practices.",
-        feedbackWrong: "Incorrect. The described liability is about negligence in reasonable security practices and resulting loss/gain."
+      { id:"ITACT-Q9", topic:"Section 43A", difficulty:3, brief:"A data privacy negligence issue is raised.",
+        q:"Section 43A concerns liability of a body corporate when it is negligent in:",
+        choices:["Maintaining reasonable security practices leading to wrongful loss/gain","Providing free internet access to citizens","Publishing all contracts in paper form only","Running antivirus scans daily"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. It covers negligence in reasonable security practices resulting in loss/gain.",
+        feedbackWrong:"Incorrect. It is about negligence in reasonable security practices and resulting loss/gain."
       },
-      {
-        id: "ITACT-Q10",
-        topic: "Investigation powers",
-        difficulty: 3,
-        brief: "The judge asks who can investigate/raid for cyber offences as per the chapter.",
-        q: "After amendment (as per the chapter), offences can be investigated and raids conducted by a police officer of at least the rank of:",
-        choices: ["Police Inspector", "Constable", "Superintendent of Police only", "Deputy Commissioner only"],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. The chapter notes the rank lowered from DySP to Police Inspector (Section 78 amended).",
-        feedbackWrong: "Incorrect. The chapter states the amended rank is Police Inspector."
+      { id:"ITACT-Q10", topic:"Investigation powers", difficulty:3, brief:"The judge asks who can investigate/raid for cyber offences.",
+        q:"After amendment, offences can be investigated and raids conducted by a police officer of at least the rank of:",
+        choices:["Police Inspector","Constable","Superintendent of Police only","Deputy Commissioner only"],
+        answerIndex:0,
+        feedbackCorrect:"Correct. Rank lowered to Police Inspector (as described).",
+        feedbackWrong:"Incorrect. The described amended rank is Police Inspector."
       }
     ];
 
@@ -1174,6 +1145,7 @@
     const gavelSpark = must("gavelSpark");
 
     const judgeSvg = must("judgeSvg");
+    const judgeGavel = must("judgeGavel");
 
     const stamp = must("stamp");
     const confetti = must("confetti");
@@ -1195,11 +1167,8 @@
     function ensureAudio(){
       if(!state.soundOn) return null;
       if(!audioCtx){
-        try{
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }catch(e){
-          audioCtx = null;
-        }
+        try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch(e){ audioCtx = null; }
       }
       return audioCtx;
     }
@@ -1236,7 +1205,6 @@
       if(!ctx) return;
       const now = ctx.currentTime;
 
-      // metallic clang: two detuned sines + short decay
       const o1 = ctx.createOscillator();
       const o2 = ctx.createOscillator();
       const g = ctx.createGain();
@@ -1272,12 +1240,22 @@
         .replace(/'/g,"&#039;");
     }
 
-    function tapGavel(){
+    function tapGavelUI(){
       gavel.classList.remove("tap");
       gavelSpark.classList.remove("show");
       void gavel.offsetWidth;
       gavel.classList.add("tap");
       gavelSpark.classList.add("show");
+    }
+
+    function judgeStrike(){
+      // Judge uses hammer
+      judgeGavel.classList.remove("strike");
+      void judgeGavel.getBBox(); // force reflow for SVG
+      judgeGavel.classList.add("strike");
+
+      // UI gavel echoes the strike for stronger feel
+      tapGavelUI();
       gavelSound();
     }
 
@@ -1294,8 +1272,6 @@
       confetti.innerHTML = "";
       cageWrap.classList.remove("show");
       clientSvg.classList.remove("walkOut");
-      clientSvg.style.opacity = "";
-      clientSvg.style.transform = "";
       state.locked = false;
 
       const btns = options.querySelectorAll(".opt");
@@ -1357,7 +1333,7 @@
         confetti.appendChild(p);
       }
       confetti.classList.add("show");
-      setTimeout(()=> confetti.classList.remove("show"), 1400);
+      setTimeout(() => confetti.classList.remove("show"), 1600);
     }
 
     function showVerdictScreen(){ verdictScreen.classList.add("show"); }
@@ -1385,7 +1361,7 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 800);
+      setTimeout(() => URL.revokeObjectURL(a.href), 800);
     }
 
     // ===== FLOW =====
@@ -1413,6 +1389,9 @@
       caseNo.textContent = "Case #1";
       caseBrief.textContent = "Case brief will appear here.";
 
+      btnNext.textContent = "Next Case";
+      btnNext.disabled = false;
+
       updateHUD();
       resetSceneFX();
     }
@@ -1430,6 +1409,8 @@
     function nextCase(){
       hideVerdictScreen();
       resetSceneFX();
+
+      btnNext.disabled = false;
 
       if(state.index >= state.totalCases){
         verdictTitle.textContent = "Session Complete";
@@ -1493,8 +1474,13 @@
         }
       });
 
-      tapGavel();
+      // Judge facial/manner cue immediately
       judgeManner(correct);
+
+      // After a short beat, judge strikes the hammer (gavel)
+      setTimeout(() => {
+        judgeStrike();
+      }, TIMING.judgeStrikeAfterMs);
 
       let points = 0;
 
@@ -1505,7 +1491,9 @@
 
         popStamp(true);
         fireConfetti();
-        setTimeout(()=> clientSvg.classList.add("walkOut"), 220);
+
+        // Let learner notice bail moment, then client walks out
+        setTimeout(() => clientSvg.classList.add("walkOut"), 420);
 
         verdictTitle.textContent = "Bail Granted";
         verdictLine.textContent = "Order passed. You earned " + points + " points.";
@@ -1515,17 +1503,21 @@
         points = 0;
         popStamp(false);
 
-        // cage effect + metallic clang
-        setTimeout(()=>{
+        // Custody cage comes in slightly after the stamp
+        setTimeout(() => {
           cageWrap.classList.add("show");
           cageClangSound();
-        }, 140);
+        }, 420);
 
         verdictTitle.textContent = "Judicial Custody";
         verdictLine.textContent = "Bail denied. Remand executed.";
         verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackWrong;
       }
+
+      // Prevent rushing
+      btnNext.disabled = true;
+      setTimeout(() => { btnNext.disabled = false; }, TIMING.enableNextAfterMs);
 
       logAttempt({
         caseNo: state.index + 1,
@@ -1539,7 +1531,9 @@
       });
 
       updateHUD();
-      setTimeout(()=> showVerdictScreen(), 900);
+
+      // Slower reveal of the verdict overlay (main fix)
+      setTimeout(() => showVerdictScreen(), TIMING.showOutcomeFxMs);
     }
 
     function goNext(){
@@ -1559,7 +1553,7 @@
       const payload = {
         meta: {
           game: "Courtroom Bail GBL",
-          version: "v2.3 (IT Act MCQs + cage custody + judge manners)",
+          version: "v2.4 (slower outcome + judge hammer strike)",
           totalCases: state.totalCases,
           exportedAt: new Date().toISOString()
         },
