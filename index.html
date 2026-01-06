@@ -889,4 +889,478 @@
               You are the defence lawyer. Each hearing you get one MCQ based on the chapter.
               Correct answer grants bail; wrong answer sends the client to custody. Aim for maximum bails.
             </p>
-          </div
+          </div>
+          <div class="introBody">
+            <div class="ruleBox">
+              <b>Rules (v2)</b><br/>
+              • One attempt per question (no appeal).<br/>
+              • Correct: +10 points and bail granted.<br/>
+              • Wrong: 0 points and judicial custody shown with an animation.<br/>
+              • Same-screen layout supports smartphones (scene on top, MCQ panel below).<br/>
+              • Game ends after a fixed number of cases (default 10).
+            </div>
+            <div class="ruleBox">
+              <b>Teacher note</b><br/>
+              Replace the sample question bank in <code>QUESTION_BANK</code> with MCQs from your uploaded chapter.
+            </div>
+          </div>
+          <div class="introActions">
+            <button class="btn primary" id="btnIntroStart">Start Hearings</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script>
+    /***********************
+     * CONFIG
+     ***********************/
+    const TOTAL_CASES = 10;
+
+    // Replace with chapter-based MCQs.
+    // { id, topic, difficulty, brief, q, choices:[A,B,C,D], answerIndex (0..3), feedbackCorrect, feedbackWrong }
+    const QUESTION_BANK = [
+      {
+        id: "CH-Q1",
+        topic: "Foundations",
+        difficulty: 1,
+        brief: "The accused requests bail. The judge tests your grasp of core security objectives.",
+        q: "Which statement best describes the primary goal of information security?",
+        choices: [
+          "Ensure confidentiality, integrity, and availability of information",
+          "Increase internet speed and reduce latency",
+          "Replace passwords with biometrics in all systems",
+          "Eliminate all risk by blocking network access"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. The CIA triad (confidentiality, integrity, availability) is a standard framing of information security goals.",
+        feedbackWrong: "Not correct. The fundamental goal is not speed or absolute risk removal; it is commonly framed using confidentiality, integrity, and availability."
+      },
+      {
+        id: "CH-Q2",
+        topic: "Threats",
+        difficulty: 1,
+        brief: "The prosecution cites a suspicious email trail. The judge asks about common attack intent.",
+        q: "A phishing email mainly attempts to:",
+        choices: [
+          "Physically damage computer hardware",
+          "Trick users into revealing sensitive information",
+          "Upgrade the operating system automatically",
+          "Encrypt backups to improve recovery"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Phishing is social engineering intended to deceive users into sharing credentials or sensitive data.",
+        feedbackWrong: "Not correct. Phishing focuses on deception and information theft, not hardware damage or system upgrades."
+      },
+      {
+        id: "CH-Q3",
+        topic: "Controls",
+        difficulty: 2,
+        brief: "The judge asks what control best reduces harm if a password is compromised.",
+        q: "Which control most directly reduces the impact of a compromised password?",
+        choices: [
+          "Multi-factor authentication (MFA)",
+          "Defragmenting the hard disk",
+          "Increasing screen brightness",
+          "Turning off all firewalls"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. MFA adds an additional verification factor so a password alone is insufficient.",
+        feedbackWrong: "Not correct. The relevant idea is adding an extra factor beyond the password."
+      },
+      {
+        id: "CH-Q4",
+        topic: "Malware",
+        difficulty: 2,
+        brief: "A device was locked and access was demanded for payment. The judge asks the correct term.",
+        q: "Ransomware is best described as malware that:",
+        choices: [
+          "Steals data silently without any visible effects",
+          "Encrypts files and demands payment to restore access",
+          "Only affects mobile devices and not computers",
+          "Improves system security by patching vulnerabilities"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Ransomware commonly encrypts files and demands payment for decryption.",
+        feedbackWrong: "Not correct. The defining behavior is encryption plus extortion."
+      }
+    ];
+
+    const CASE_TEMPLATES = [
+      "The accused requests bail. The prosecution claims a risk of repeating the offence.",
+      "The accused is a first-time offender. The court seeks clarity on a relevant concept.",
+      "Digital evidence is cited. You must respond using correct principles.",
+      "The judge asks a concept question to test your argument before granting bail.",
+      "A procedural concern is raised. Bail conditions must be justified with correct reasoning."
+    ];
+
+    /***********************
+     * STATE
+     ***********************/
+    const state = {
+      totalCases: TOTAL_CASES,
+      index: 0,
+      score: 0,
+      bails: 0,
+      current: null,
+      attemptLog: [],
+      locked: false
+    };
+
+    /***********************
+     * DOM
+     ***********************/
+    const el = (id) => document.getElementById(id);
+
+    const hudCase = el("hudCase");
+    const hudScore = el("hudScore");
+    const hudBails = el("hudBails");
+
+    const caseNo = el("caseNo");
+    const caseBrief = el("caseBrief");
+
+    const quizTitle = el("quizTitle");
+    const quizSub = el("quizSub");
+
+    const qText = el("qText");
+    const qMeta = el("qMeta");
+    const options = el("options");
+
+    const btnStart = el("btnStart");
+    const btnRestart = el("btnRestart");
+    const btnExport = el("btnExport");
+
+    const intro = el("intro");
+    const btnIntroStart = el("btnIntroStart");
+
+    const gavel = el("gavel");
+    const stamp = el("stamp");
+    const confetti = el("confetti");
+
+    const custodyOverlay = el("custodyOverlay");
+    const clientSvg = el("clientSvg");
+
+    const verdictScreen = el("verdictScreen");
+    const verdictTitle = el("verdictTitle");
+    const verdictLine = el("verdictLine");
+    const verdictPoints = el("verdictPoints");
+    const verdictFeedback = el("verdictFeedback");
+    const btnNext = el("btnNext");
+
+    const toast = el("toast");
+
+    /***********************
+     * HELPERS
+     ***********************/
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1000);
+    }
+
+    function tapGavel(){
+      gavel.classList.remove("tap");
+      void gavel.offsetWidth;
+      gavel.classList.add("tap");
+    }
+
+    function resetSceneFX(){
+      stamp.className = "stamp";
+      stamp.textContent = "";
+      confetti.className = "confetti";
+      confetti.innerHTML = "";
+      custodyOverlay.classList.remove("show");
+      clientSvg.classList.remove("walkOut");
+      clientSvg.style.opacity = "";
+      clientSvg.style.transform = "";
+      state.locked = false;
+      // clear option styles
+      [...options.querySelectorAll(".opt")].forEach(b=>{
+        b.classList.remove("correct","wrong");
+        b.disabled = false;
+        b.querySelector("small").textContent = "Tap to submit";
+      });
+    }
+
+    function popStamp(isGood){
+      stamp.className = "stamp " + (isGood ? "good" : "bad") + " show";
+      stamp.textContent = isGood ? "BAIL GRANTED" : "JUDICIAL CUSTODY";
+    }
+
+    function fireConfetti(){
+      confetti.innerHTML = "";
+      const pieces = 26;
+      for(let i=0;i<pieces;i++){
+        const p = document.createElement("i");
+        p.style.left = Math.random()*100 + "%";
+        p.style.animationDelay = (Math.random()*0.12) + "s";
+        const hue = Math.floor(Math.random()*360);
+        p.style.background = `hsla(${hue}, 85%, 65%, .95)`;
+        p.style.width = (8 + Math.random()*6) + "px";
+        p.style.height = (10 + Math.random()*10) + "px";
+        confetti.appendChild(p);
+      }
+      confetti.classList.add("show");
+      setTimeout(()=> confetti.classList.remove("show"), 1400);
+    }
+
+    function updateHUD(){
+      hudCase.textContent = `${Math.min(state.index+1, state.totalCases)} / ${state.totalCases}`;
+      hudScore.textContent = `${state.score}`;
+      hudBails.textContent = `${state.bails}`;
+    }
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function pickQuestion(){
+      // simple cycling sampler; replace with random/no-repeat if you expand the bank
+      const idx = state.index % QUESTION_BANK.length;
+      return QUESTION_BANK[idx];
+    }
+
+    function genBrief(){
+      const t = CASE_TEMPLATES[state.index % CASE_TEMPLATES.length];
+      return t;
+    }
+
+    function logAttempt(entry){
+      state.attemptLog.push({ ts: new Date().toISOString(), ...entry });
+    }
+
+    function downloadJSON(filename, obj){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 800);
+    }
+
+    function showVerdictScreen(){
+      verdictScreen.classList.add("show");
+    }
+    function hideVerdictScreen(){
+      verdictScreen.classList.remove("show");
+    }
+
+    /***********************
+     * GAME FLOW
+     ***********************/
+    function resetGame(){
+      state.index = 0;
+      state.score = 0;
+      state.bails = 0;
+      state.current = null;
+      state.attemptLog = [];
+      hideVerdictScreen();
+      updateHUD();
+      resetSceneFX();
+      intro.style.display = "flex";
+      quizTitle.textContent = "Ready";
+      quizSub.textContent = "Start the hearings. One attempt per question.";
+      qText.textContent = "Press “Start” to begin.";
+      qMeta.textContent = "Topic: — • Difficulty: — • Question ID: —";
+      options.innerHTML = "";
+      btnStart.textContent = "Start";
+    }
+
+    function startGame(){
+      intro.style.display = "none";
+      state.index = 0;
+      state.score = 0;
+      state.bails = 0;
+      state.attemptLog = [];
+      nextCase();
+    }
+
+    function nextCase(){
+      hideVerdictScreen();
+      resetSceneFX();
+
+      if(state.index >= state.totalCases){
+        // end
+        verdictTitle.textContent = "Session Complete";
+        verdictLine.textContent = `You secured ${state.bails} bails out of ${state.totalCases}.`;
+        verdictPoints.textContent = `${state.score}`;
+        verdictFeedback.textContent = "Export the log for research analysis, or restart to play again.";
+        btnNext.textContent = "Restart";
+        showVerdictScreen();
+        return;
+      }
+
+      btnNext.textContent = "Next Case";
+      state.current = pickQuestion();
+
+      // Scene labels
+      caseNo.textContent = `Case #${state.index+1}`;
+      caseBrief.textContent = state.current.brief || genBrief();
+
+      // Quiz
+      quizTitle.textContent = "Judge’s Question";
+      quizSub.textContent = "Choose the best answer. One attempt only.";
+      qText.textContent = state.current.q;
+      qMeta.textContent = `Topic: ${state.current.topic} • Difficulty: ${state.current.difficulty} • Question ID: ${state.current.id}`;
+
+      // Render options
+      options.innerHTML = "";
+      const labels = ["A","B","C","D"];
+      state.current.choices.forEach((c, idx)=>{
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.type = "button";
+        b.innerHTML = `<div><b>${labels[idx]}.</b> ${escapeHTML(c)}</div><small>Tap to submit</small>`;
+        b.addEventListener("click", () => submitAnswer(idx));
+        options.appendChild(b);
+      });
+
+      btnStart.textContent = "Hearings Running";
+      btnStart.disabled = true;
+
+      updateHUD();
+    }
+
+    function submitAnswer(selectedIndex){
+      if(state.locked) return;
+      state.locked = true;
+
+      // Lock all options immediately (one attempt)
+      const btns = [...options.querySelectorAll(".opt")];
+      btns.forEach(b=> b.disabled = true);
+
+      const correctIdx = state.current.answerIndex;
+      const correct = selectedIndex === correctIdx;
+
+      // Mark answers
+      btns.forEach((b, idx)=>{
+        if(idx === correctIdx) b.classList.add("correct");
+        if(idx === selectedIndex && idx !== correctIdx) b.classList.add("wrong");
+        const sm = b.querySelector("small");
+        if(idx === correctIdx) sm.textContent = "Correct option";
+        else if(idx === selectedIndex) sm.textContent = "Your selection";
+        else sm.textContent = "Option";
+      });
+
+      // Scene FX + Next screen
+      tapGavel();
+
+      let points = 0;
+
+      if(correct){
+        points = 10;
+        state.score += points;
+        state.bails += 1;
+
+        popStamp(true);
+        fireConfetti();
+
+        // client "walk out" animation for bail
+        setTimeout(()=> clientSvg.classList.add("walkOut"), 220);
+
+        verdictTitle.textContent = "Bail Granted";
+        verdictLine.textContent = `Good argument. You earned ${points} points.`;
+        verdictPoints.textContent = `${points}`;
+        verdictFeedback.textContent = state.current.feedbackCorrect;
+
+        logAttempt({
+          caseNo: state.index+1,
+          qid: state.current.id,
+          topic: state.current.topic,
+          difficulty: state.current.difficulty,
+          selectedIndex,
+          correctIndex: correctIdx,
+          correct: true,
+          pointsAwarded: points
+        });
+
+        updateHUD();
+
+        // Show next screen after a short beat
+        setTimeout(()=> showVerdictScreen(), 850);
+
+      } else {
+        points = 0;
+
+        popStamp(false);
+
+        // custody animation overlay
+        setTimeout(()=>{
+          custodyOverlay.classList.add("show");
+        }, 180);
+
+        verdictTitle.textContent = "Judicial Custody";
+        verdictLine.textContent = "Bail denied due to incorrect reasoning.";
+        verdictPoints.textContent = `${points}`;
+        verdictFeedback.textContent = state.current.feedbackWrong;
+
+        logAttempt({
+          caseNo: state.index+1,
+          qid: state.current.id,
+          topic: state.current.topic,
+          difficulty: state.current.difficulty,
+          selectedIndex,
+          correctIndex: correctIdx,
+          correct: false,
+          pointsAwarded: points
+        });
+
+        updateHUD();
+
+        setTimeout(()=> showVerdictScreen(), 850);
+      }
+    }
+
+    function goNext(){
+      if(state.index >= state.totalCases){
+        // finished -> restart
+        resetGame();
+        return;
+      }
+      state.index += 1;
+      nextCase();
+    }
+
+    function exportLog(){
+      const payload = {
+        meta: {
+          game: "Courtroom Bail GBL",
+          version: "v2 (single-screen + verdict screen + one attempt)",
+          totalCases: state.totalCases,
+          exportedAt: new Date().toISOString()
+        },
+        results: {
+          score: state.score,
+          bails: state.bails
+        },
+        attempts: state.attemptLog
+      };
+      downloadJSON(`courtroom_bail_gbl_log_${Date.now()}.json`, payload);
+      showToast("Log exported");
+    }
+
+    /***********************
+     * EVENTS
+     ***********************/
+    btnIntroStart.addEventListener("click", startGame);
+    btnStart.addEventListener("click", startGame);
+    btnNext.addEventListener("click", goNext);
+    btnRestart.addEventListener("click", resetGame);
+    btnExport.addEventListener("click", exportLog);
+
+    // init
+    resetGame();
+  </script>
+</body>
+</html>
