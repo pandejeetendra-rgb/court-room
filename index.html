@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bail or Custody — Courtroom GBL (v1)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a33;
+      --card:#121f3d;
+      --ink:#eaf0ff;
+      --muted:#a9b6da;
+      --accent:#6aa6ff;
+      --good:#31d07c;
+      --bad:#ff5d6c;
+      --gold:#ffd66a;
+      --stroke:rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1000px 500px at 20% -10%, rgba(106,166,255,.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(255,214,106,.18), transparent 55%),
+        radial-gradient(800px 600px at 50% 120%, rgba(49,208,124,.10), transparent 55%),
+        linear-gradient(180deg, #070c18, #0b1220 55%, #070c18);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:240px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%),
+        linear-gradient(135deg, rgba(106,166,255,.9), rgba(49,208,124,.8));
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40% -20%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,.25), transparent);
+      transform: rotate(20deg);
+      animation: sheen 5s linear infinite;
+    }
+    @keyframes sheen{
+      0%{transform:translateX(-40%) rotate(20deg)}
+      100%{transform:translateX(70%) rotate(20deg)}
+    }
+    .title{
+      line-height:1.15;
+    }
+    .title h1{margin:0;font-size:18px;font-weight:800;letter-spacing:.2px}
+    .title p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+    .hud{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      width:100%;
+    }
+    .pill{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:8px 10px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+      backdrop-filter: blur(8px);
+    }
+    .pill b{font-size:12.5px}
+    .pill span{font-size:12px;color:var(--muted)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+      .hud{justify-content:flex-start}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding:14px 14px 0;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.35;
+    }
+    .cardBody{padding:14px}
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.07);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.10)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(106,166,255,.95), rgba(49,208,124,.85));
+      border-color: rgba(255,255,255,.18);
+      color:#061021;
+    }
+    .btn.warn{
+      background: linear-gradient(135deg, rgba(255,214,106,.95), rgba(255,120,106,.85));
+      border-color: rgba(255,255,255,.18);
+      color:#1a0c05;
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+    .btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .stage{
+      position:relative;
+      min-height:520px;
+      background:
+        radial-gradient(600px 300px at 50% 0%, rgba(106,166,255,.18), transparent 60%),
+        linear-gradient(180deg, rgba(15,26,51,.6), rgba(10,16,30,.85));
+    }
+    @media (max-width: 900px){
+      .stage{min-height:470px}
+    }
+
+    /* Screens */
+    .screen{display:none}
+    .screen.active{display:block}
+
+    /* Courtroom illustration */
+    .court{
+      position:relative;
+      height:360px;
+      margin:12px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(700px 280px at 50% -20%, rgba(255,255,255,.12), transparent 60%),
+        radial-gradient(700px 300px at 50% 120%, rgba(0,0,0,.35), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      overflow:hidden;
+    }
+    .floor{
+      position:absolute; left:-10%; right:-10%; bottom:-35%;
+      height:60%;
+      background: linear-gradient(180deg, rgba(255,214,106,.14), rgba(255,214,106,.06));
+      transform: skewY(-6deg);
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .bench{
+      position:absolute; top:42px; left:50%;
+      transform: translateX(-50%);
+      width:min(520px, 86%);
+      height:130px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(91,58,32,.85), rgba(44,25,14,.88));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .bench:before{
+      content:"";
+      position:absolute; left:18px; right:18px; top:16px;
+      height:22px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.03));
+    }
+    .judge{
+      position:absolute; top:10px; left:50%;
+      transform: translateX(-50%);
+      width:140px; height:160px;
+      pointer-events:none;
+    }
+    .judge .head{
+      position:absolute; top:4px; left:50%;
+      transform: translateX(-50%);
+      width:54px; height:54px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.35), rgba(225,213,196,.95) 55%, rgba(193,175,152,.9));
+      border:1px solid rgba(0,0,0,.15);
+    }
+    .judge .hair{
+      position:absolute; top:-2px; left:50%;
+      transform: translateX(-50%);
+      width:62px; height:40px;
+      border-radius: 20px 20px 26px 26px;
+      background: linear-gradient(180deg, rgba(240,240,255,.95), rgba(205,205,230,.85));
+      opacity:.95;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,.18));
+    }
+    .judge .robe{
+      position:absolute; top:55px; left:50%;
+      transform: translateX(-50%);
+      width:92px; height:86px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(20,20,28,.95), rgba(8,8,12,.92));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .judge .badge{
+      position:absolute; top:70px; left:50%;
+      transform: translateX(-50%);
+      width:48px; height:10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,214,106,.95), rgba(106,166,255,.85));
+      opacity:.8;
+    }
+
+    .lawyer, .accused{
+      position:absolute; bottom:88px;
+      width:160px; height:160px;
+    }
+    .lawyer{left:42px}
+    .accused{right:42px}
+    @media (max-width: 520px){
+      .lawyer{left:16px}
+      .accused{right:16px}
+    }
+    .person .head{
+      position:absolute; top:10px; left:50%;
+      transform: translateX(-50%);
+      width:46px; height:46px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.32), rgba(226,210,190,.95) 55%, rgba(190,170,145,.9));
+      border:1px solid rgba(0,0,0,.12);
+    }
+    .person .body{
+      position:absolute; top:52px; left:50%;
+      transform: translateX(-50%);
+      width:88px; height:92px; border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+    .lawyer .body{
+      background: linear-gradient(180deg, rgba(106,166,255,.95), rgba(40,70,140,.88));
+    }
+    .accused .body{
+      background: linear-gradient(180deg, rgba(255,120,140,.88), rgba(120,40,60,.85));
+    }
+    .person .tie{
+      position:absolute; top:74px; left:50%;
+      transform: translateX(-50%);
+      width:14px; height:46px;
+      clip-path: polygon(50% 0, 100% 22%, 50% 45%, 0 22%);
+      background: rgba(255,255,255,.28);
+      opacity:.9;
+    }
+    .accused .bars{
+      position:absolute; left:22px; right:22px; top:38px; bottom:14px;
+      border-radius: 14px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(0,0,0,.25) 0,
+          rgba(0,0,0,.25) 6px,
+          rgba(255,255,255,.06) 6px,
+          rgba(255,255,255,.06) 16px
+        );
+      mix-blend-mode: overlay;
+      opacity:.65;
+      pointer-events:none;
+    }
+
+    .desk{
+      position:absolute; bottom:58px; left:22px; right:22px;
+      height:36px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(91,58,32,.7), rgba(44,25,14,.78));
+      border:1px solid rgba(255,255,255,.08);
+      opacity:.95;
+    }
+
+    /* Gavel */
+    .gavel{
+      position:absolute; top:86px; right:20px;
+      width:68px; height:68px;
+      transform-origin: 60% 60%;
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,.35));
+      opacity:.9;
+    }
+    .gavel .head{
+      position:absolute; left:10px; top:10px;
+      width:30px; height:18px; border-radius: 6px;
+      background: linear-gradient(180deg, rgba(255,214,106,.75), rgba(255,214,106,.25));
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .gavel .handle{
+      position:absolute; left:26px; top:22px;
+      width:30px; height:10px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, rgba(255,214,106,.55), rgba(255,214,106,.18));
+      transform: rotate(35deg);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .gavel.tap{animation: gavelTap .45s ease}
+    @keyframes gavelTap{
+      0%{transform: rotate(0deg) translateY(0)}
+      35%{transform: rotate(-18deg) translateY(-6px)}
+      60%{transform: rotate(8deg) translateY(2px)}
+      100%{transform: rotate(0deg) translateY(0)}
+    }
+
+    /* Stamp */
+    .stamp{
+      position:absolute;
+      left:50%; top:56%;
+      transform: translate(-50%,-50%) rotate(-8deg) scale(.9);
+      padding:10px 14px;
+      border-radius: 14px;
+      border:2px dashed rgba(255,255,255,.35);
+      background: rgba(0,0,0,.30);
+      font-weight:900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display:none;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .stamp.good{color: rgba(49,208,124,.98); border-color: rgba(49,208,124,.8)}
+    .stamp.bad{color: rgba(255,93,108,.98); border-color: rgba(255,93,108,.8)}
+    .stamp.show{display:block; animation: stampPop .5s ease}
+    @keyframes stampPop{
+      0%{opacity:0; transform: translate(-50%,-50%) rotate(-14deg) scale(.5)}
+      60%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1.05)}
+      100%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1)}
+    }
+
+    /* Confetti */
+    .confetti{
+      position:absolute; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      display:none;
+    }
+    .confetti.show{display:block}
+    .confetti i{
+      position:absolute;
+      top:-10%;
+      width:10px; height:16px;
+      border-radius: 3px;
+      opacity:.9;
+      animation: fall 1.2s linear forwards;
+    }
+    @keyframes fall{
+      0%{transform: translateY(-10vh) rotate(0deg); opacity:1}
+      100%{transform: translateY(120vh) rotate(260deg); opacity:.9}
+    }
+
+    /* Content */
+    .panel{
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--stroke);
+      border-radius: 14px;
+      padding:12px;
+    }
+    .kv{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      padding:6px 8px;
+      border-radius: 999px;
+    }
+    .big{
+      font-size:16px;
+      line-height:1.45;
+      margin:0;
+    }
+
+    .options{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .opt{
+      text-align:left;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      transition: background .2s ease, border-color .2s ease, transform .06s ease;
+      font-weight:700;
+      color:var(--ink);
+    }
+    .opt:hover{background: rgba(255,255,255,.10)}
+    .opt:active{transform: translateY(1px)}
+    .opt small{display:block;color:var(--muted);font-weight:600;margin-top:6px;line-height:1.35}
+    .opt.correct{border-color: rgba(49,208,124,.75); background: rgba(49,208,124,.10)}
+    .opt.wrong{border-color: rgba(255,93,108,.75); background: rgba(255,93,108,.10)}
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .twoCol{grid-template-columns:1fr}
+    }
+
+    .divider{
+      height:1px;
+      background: rgba(255,255,255,.10);
+      margin:12px 0;
+    }
+    .note{
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.4;
+    }
+
+    /* Right side */
+    .side{
+      padding:14px;
+    }
+    .side h3{margin:0;font-size:14px;font-weight:900}
+    .side p{margin:8px 0 0;color:var(--muted);font-size:12.5px;line-height:1.45}
+
+    .list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .li{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius: 14px;
+      padding:10px;
+    }
+    .li b{font-size:12.5px}
+    .li span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+
+    /* Toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:20px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      display:none;
+      backdrop-filter: blur(8px);
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .toast.show{display:block; animation: toastIn .25s ease}
+    @keyframes toastIn{
+      from{opacity:0; transform: translateX(-50%) translateY(8px)}
+      to{opacity:1; transform: translateX(-50%) translateY(0)}
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none !important; transition:none !important}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">
+          <h1>Bail or Custody — Courtroom GBL</h1>
+          <p>Answer correctly to secure bail. Maximize bails across hearings.</p>
+        </div>
+      </div>
+
+      <div class="hud">
+        <div class="pill"><b>Case</b> <span id="hudCase">0 / 10</span></div>
+        <div class="pill"><b>Score</b> <span id="hudScore">0</span></div>
+        <div class="pill"><b>Streak</b> <span id="hudStreak">0</span></div>
+        <div class="pill"><b>Bails</b> <span id="hudBails">0</span></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Main Stage -->
+      <div class="card stage">
+        <div class="cardHead">
+          <div>
+            <h2 id="screenTitle">Welcome</h2>
+            <p class="sub" id="screenSub">A lightweight, mobile-friendly courtroom learning game.</p>
+          </div>
+          <div class="row">
+            <button class="btn ghost" id="btnRestart" title="Restart">Restart</button>
+            <button class="btn warn" id="btnExport" title="Export attempt log">Export Log</button>
+          </div>
+        </div>
+
+        <div class="court" aria-hidden="true">
+          <div class="bench"></div>
+          <div class="judge">
+            <div class="hair"></div>
+            <div class="head"></div>
+            <div class="robe"></div>
+            <div class="badge"></div>
+          </div>
+
+          <div class="lawyer person">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="tie"></div>
+          </div>
+
+          <div class="accused person">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="bars"></div>
+          </div>
+
+          <div class="desk"></div>
+
+          <div class="gavel" id="gavel">
+            <div class="head"></div>
+            <div class="handle"></div>
+          </div>
+
+          <div class="stamp" id="stamp"></div>
+          <div class="confetti" id="confetti"></div>
+
+          <div class="floor"></div>
+        </div>
+
+        <div class="cardBody">
+          <!-- Screens -->
+          <div class="screen active" id="scrIntro">
+            <div class="panel">
+              <p class="big" style="margin:0">
+                You are the <b>defence lawyer</b>. Each hearing, the judge asks a question based on your chapter.
+                If you answer correctly, <b>bail is granted</b>. Otherwise, the client goes to <b>judicial custody</b>.
+              </p>
+              <div class="kv">
+                <span class="tag">10 cases (default)</span>
+                <span class="tag">+10 per bail</span>
+                <span class="tag">Streak bonus</span>
+                <span class="tag">1 Precedent hint</span>
+                <span class="tag">1 Appeal chance</span>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="twoCol">
+                <div class="panel">
+                  <b>How to play</b>
+                  <div class="note" style="margin-top:6px">
+                    1) Read the case brief.<br/>
+                    2) Pick one answer.<br/>
+                    3) Watch the judgment.<br/>
+                    4) Try to build a bail streak.
+                  </div>
+                </div>
+                <div class="panel">
+                  <b>Replace questions</b>
+                  <div class="note" style="margin-top:6px">
+                    This file includes a sample question bank. Replace it with MCQs prepared from your uploaded chapter
+                    inside <code>QUESTION_BANK</code> (near the top of the script).
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="row">
+                <button class="btn primary" id="btnStart">Start Hearings</button>
+                <button class="btn" id="btnHow">Show Rules</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="scrRules">
+            <div class="panel">
+              <b>Rules (v1)</b>
+              <div class="note" style="margin-top:8px">
+                • Each case has one MCQ. Choose one option.<br/>
+                • Correct = Bail granted (+10). Wrong = Custody (0).<br/>
+                • Streak bonus: after 3 consecutive bails, every additional correct answer gives +5 extra.<br/>
+                • You get 1 “Precedent” hint (removes one wrong option).<br/>
+                • You get 1 “Appeal” chance (re-attempt once after a wrong answer).<br/>
+                • Game ends after 10 cases. Your goal is maximum bails.
+              </div>
+
+              <div class="divider"></div>
+              <div class="row">
+                <button class="btn primary" id="btnBackIntro">Back</button>
+                <button class="btn" id="btnStart2">Start</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="scrCase">
+            <div class="panel">
+              <b>Case Brief</b>
+              <p class="big" id="caseBrief" style="margin:8px 0 0"></p>
+
+              <div class="divider"></div>
+
+              <div class="row">
+                <button class="btn primary" id="btnToQuestion">Proceed to Judge’s Question</button>
+              </div>
+              <p class="note" style="margin-top:10px">
+                Tip: read the brief carefully. The best answer should follow the concept from the chapter.
+              </p>
+            </div>
+          </div>
+
+          <div class="screen" id="scrQuestion">
+            <div class="panel">
+              <b>Judge’s Question</b>
+              <p class="big" id="qText" style="margin:8px 0 0"></p>
+
+              <div class="row" style="margin-top:10px">
+                <button class="btn" id="btnPrecedent">Use Precedent (Hint)</button>
+                <button class="btn" id="btnAppeal" disabled>Appeal (Used after wrong)</button>
+              </div>
+
+              <div class="options" id="options"></div>
+
+              <div class="divider"></div>
+
+              <div class="note" id="qMeta"></div>
+            </div>
+          </div>
+
+          <div class="screen" id="scrVerdict">
+            <div class="panel">
+              <b>Judgment</b>
+              <p class="big" id="verdictText" style="margin:8px 0 0"></p>
+              <div class="divider"></div>
+              <div class="panel" style="background: rgba(255,255,255,.03)">
+                <b>Feedback</b>
+                <div class="note" id="feedback" style="margin-top:8px"></div>
+              </div>
+              <div class="divider"></div>
+              <div class="row">
+                <button class="btn primary" id="btnNext">Next Case</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="scrSummary">
+            <div class="panel">
+              <b>Session Summary</b>
+              <p class="big" id="sumLine" style="margin:8px 0 0"></p>
+
+              <div class="divider"></div>
+
+              <div class="twoCol">
+                <div class="panel">
+                  <b>Performance</b>
+                  <div class="note" id="sumPerf" style="margin-top:8px"></div>
+                </div>
+                <div class="panel">
+                  <b>Next Step</b>
+                  <div class="note" style="margin-top:8px">
+                    Replace the sample MCQs with questions extracted from your uploaded chapter, keeping each item:
+                    <br/>• one correct option
+                    <br/>• short feedback
+                    <br/>• balanced correct answers across A/B/C/D
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="row">
+                <button class="btn primary" id="btnPlayAgain">Play Again</button>
+                <button class="btn warn" id="btnExport2">Export Log</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Panel -->
+      <div class="card side">
+        <h3>Teacher Controls (v1)</h3>
+        <p>
+          This version is a single-file prototype. Update the question bank inside the script to use your chapter-based MCQs.
+          The log export helps you analyze learning + outcomes.
+        </p>
+
+        <ul class="list">
+          <li class="li">
+            <b>Question Bank</b>
+            <span>Replace <code>QUESTION_BANK</code> with your chapter items (MCQ + feedback).</span>
+          </li>
+          <li class="li">
+            <b>Case Count</b>
+            <span>Change <code>TOTAL_CASES</code> to 5, 10, 15 as needed.</span>
+          </li>
+          <li class="li">
+            <b>Research Use</b>
+            <span>Export log → compare accuracy, attempts, and streak behavior vs control group.</span>
+          </li>
+        </ul>
+
+        <div class="divider"></div>
+        <p class="note">
+          Note: visuals are intentionally “attractive but calm” to keep focus on learning decisions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script>
+    /***********************
+     * 1) CONFIG
+     ***********************/
+    const TOTAL_CASES = 10;
+
+    // Replace this bank with questions prepared from your uploaded chapter.
+    // Format:
+    // { id, topic, difficulty, q, choices:[A,B,C,D], answerIndex (0..3), feedbackCorrect, feedbackWrong }
+    const QUESTION_BANK = [
+      {
+        id: "CH-Q1",
+        topic: "Foundations",
+        difficulty: 1,
+        q: "Which statement best describes the primary goal of information security?",
+        choices: [
+          "Ensure confidentiality, integrity, and availability of information",
+          "Increase internet speed and reduce latency",
+          "Replace passwords with biometrics in all systems",
+          "Eliminate all risk by blocking network access"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. Information security is commonly framed around the CIA triad: confidentiality, integrity, and availability.",
+        feedbackWrong: "Not quite. The core aim is typically explained using confidentiality, integrity, and availability rather than performance or absolute risk elimination."
+      },
+      {
+        id: "CH-Q2",
+        topic: "Threats",
+        difficulty: 1,
+        q: "A phishing email mainly attempts to:",
+        choices: [
+          "Physically damage computer hardware",
+          "Trick users into revealing sensitive information",
+          "Upgrade the operating system automatically",
+          "Encrypt backups to improve recovery"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Phishing is a social engineering attack intended to deceive users and extract credentials or sensitive data.",
+        feedbackWrong: "Not correct. Phishing is about deception and data theft, not hardware damage or system upgrades."
+      },
+      {
+        id: "CH-Q3",
+        topic: "Controls",
+        difficulty: 2,
+        q: "Which control is most directly used to reduce the impact of a compromised password?",
+        choices: [
+          "Multi-factor authentication (MFA)",
+          "Defragmenting the hard disk",
+          "Increasing screen brightness",
+          "Turning off all firewalls"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. MFA adds an extra verification layer so a password alone is not enough.",
+        feedbackWrong: "Not correct. The key idea is adding an additional factor beyond the password."
+      },
+      {
+        id: "CH-Q4",
+        topic: "Malware",
+        difficulty: 2,
+        q: "Ransomware is best described as malware that:",
+        choices: [
+          "Steals data silently without any visible effects",
+          "Encrypts files and demands payment to restore access",
+          "Only affects mobile devices and not computers",
+          "Improves system security by patching vulnerabilities"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Ransomware commonly encrypts data and demands a ransom for decryption.",
+        feedbackWrong: "Not correct. The defining behavior is encryption plus extortion."
+      },
+      {
+        id: "CH-Q5",
+        topic: "Best Practices",
+        difficulty: 2,
+        q: "Which action is most effective for reducing accidental data exposure in shared environments?",
+        choices: [
+          "Using strong passwords only",
+          "Regularly updating wallpaper",
+          "Applying least privilege for access permissions",
+          "Disabling automatic screen lock"
+        ],
+        answerIndex: 2,
+        feedbackCorrect: "Correct. Least privilege limits access to what is necessary, reducing exposure risk.",
+        feedbackWrong: "Not correct. Password strength helps, but least privilege directly reduces who can access what."
+      },
+      {
+        id: "CH-Q6",
+        topic: "Networks",
+        difficulty: 3,
+        q: "A firewall primarily helps by:",
+        choices: [
+          "Filtering traffic based on rules to allow or block connections",
+          "Increasing CPU speed during heavy workloads",
+          "Automatically removing all malware from devices",
+          "Replacing the need for user training"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. Firewalls enforce network traffic rules.",
+        feedbackWrong: "Not correct. Firewalls control traffic; they do not replace training or guarantee malware removal."
+      },
+      {
+        id: "CH-Q7",
+        topic: "Authentication",
+        difficulty: 3,
+        q: "Which is an example of 'something you have' in authentication factors?",
+        choices: [
+          "A PIN code memorized by the user",
+          "A physical security token or smart card",
+          "A user’s fingerprint",
+          "A username"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Tokens and smart cards are possession factors (something you have).",
+        feedbackWrong: "Not correct. PIN is something you know; fingerprint is something you are."
+      },
+      {
+        id: "CH-Q8",
+        topic: "Awareness",
+        difficulty: 3,
+        q: "The most practical first step when receiving a suspicious link is to:",
+        choices: [
+          "Forward it to everyone for confirmation",
+          "Click it quickly before it expires",
+          "Verify the sender and destination URL through a trusted method",
+          "Disable antivirus for faster loading"
+        ],
+        answerIndex: 2,
+        feedbackCorrect: "Correct. Verify via a trusted channel and inspect the destination carefully.",
+        feedbackWrong: "Not correct. The safe approach is verification, not urgency-based clicking or forwarding."
+      }
+    ];
+
+    // Case brief templates (light, neutral).
+    const CASE_TEMPLATES = [
+      "The accused requests bail. The prosecution claims a risk of repeating the offence. As defence, you must argue using correct principles from the chapter.",
+      "The accused is a first-time offender. The court seeks clarity on the relevant concept before considering bail.",
+      "The prosecution cites digital evidence. You must respond using the correct idea from the chapter to strengthen the bail request.",
+      "The court asks you to justify why the accused can be released without compromising safety or process. Use chapter-based reasoning.",
+      "A procedural concern is raised. The judge asks a concept question to test whether bail conditions can manage the risk."
+    ];
+
+    /***********************
+     * 2) STATE
+     ***********************/
+    const state = {
+      totalCases: TOTAL_CASES,
+      currentIndex: 0,
+      score: 0,
+      bails: 0,
+      streak: 0,
+      maxStreak: 0,
+      usedPrecedent: false,
+      usedAppeal: false,
+      appealActive: false,
+      currentQ: null,
+      removedOptionIndex: null,
+      selectedIndex: null,
+      attemptLog: []
+    };
+
+    /***********************
+     * 3) DOM
+     ***********************/
+    const el = (id) => document.getElementById(id);
+
+    const hudCase = el("hudCase");
+    const hudScore = el("hudScore");
+    const hudStreak = el("hudStreak");
+    const hudBails = el("hudBails");
+
+    const screenTitle = el("screenTitle");
+    const screenSub = el("screenSub");
+
+    const gavel = el("gavel");
+    const stamp = el("stamp");
+    const confetti = el("confetti");
+
+    const scrIntro = el("scrIntro");
+    const scrRules = el("scrRules");
+    const scrCase = el("scrCase");
+    const scrQuestion = el("scrQuestion");
+    const scrVerdict = el("scrVerdict");
+    const scrSummary = el("scrSummary");
+
+    const caseBrief = el("caseBrief");
+    const qText = el("qText");
+    const options = el("options");
+    const feedback = el("feedback");
+    const verdictText = el("verdictText");
+    const qMeta = el("qMeta");
+
+    const btnStart = el("btnStart");
+    const btnHow = el("btnHow");
+    const btnBackIntro = el("btnBackIntro");
+    const btnStart2 = el("btnStart2");
+    const btnToQuestion = el("btnToQuestion");
+    const btnNext = el("btnNext");
+    const btnPlayAgain = el("btnPlayAgain");
+
+    const btnPrecedent = el("btnPrecedent");
+    const btnAppeal = el("btnAppeal");
+
+    const btnRestart = el("btnRestart");
+    const btnExport = el("btnExport");
+    const btnExport2 = el("btnExport2");
+
+    const toast = el("toast");
+
+    const sumLine = el("sumLine");
+    const sumPerf = el("sumPerf");
+
+    /***********************
+     * 4) HELPERS
+     ***********************/
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1100);
+    }
+
+    function setScreen(active){
+      [scrIntro, scrRules, scrCase, scrQuestion, scrVerdict, scrSummary].forEach(s => s.classList.remove("active"));
+      active.classList.add("active");
+    }
+
+    function updateHUD(){
+      hudCase.textContent = `${Math.min(state.currentIndex+1, state.totalCases)} / ${state.totalCases}`;
+      hudScore.textContent = `${state.score}`;
+      hudStreak.textContent = `${state.streak}`;
+      hudBails.textContent = `${state.bails}`;
+    }
+
+    function pickQuestion(){
+      // Simple method: shuffle-like selection without repeats where possible.
+      // For larger banks, replace with a better sampler.
+      const idx = state.currentIndex % QUESTION_BANK.length;
+      return QUESTION_BANK[idx];
+    }
+
+    function genCaseBrief(){
+      const t = CASE_TEMPLATES[state.currentIndex % CASE_TEMPLATES.length];
+      return `Case #${state.currentIndex+1}: ${t}`;
+    }
+
+    function resetVerdictVisuals(){
+      stamp.className = "stamp";
+      stamp.textContent = "";
+      confetti.innerHTML = "";
+      confetti.className = "confetti";
+    }
+
+    function tapGavel(){
+      gavel.classList.remove("tap");
+      // force reflow
+      void gavel.offsetWidth;
+      gavel.classList.add("tap");
+    }
+
+    function popStamp(isGood){
+      stamp.className = "stamp " + (isGood ? "good" : "bad") + " show";
+      stamp.textContent = isGood ? "BAIL GRANTED" : "JUDICIAL CUSTODY";
+    }
+
+    function fireConfetti(){
+      confetti.innerHTML = "";
+      const pieces = 26;
+      for(let i=0;i<pieces;i++){
+        const p = document.createElement("i");
+        p.style.left = Math.random()*100 + "%";
+        p.style.animationDelay = (Math.random()*0.15) + "s";
+        p.style.transform = `translateY(-10vh) rotate(${Math.random()*60}deg)`;
+        // Random-ish colors without hard-coding a single scheme
+        const hue = Math.floor(Math.random()*360);
+        p.style.background = `hsla(${hue}, 85%, 65%, .95)`;
+        p.style.width = (8 + Math.random()*6) + "px";
+        p.style.height = (10 + Math.random()*10) + "px";
+        confetti.appendChild(p);
+      }
+      confetti.classList.add("show");
+      setTimeout(()=> confetti.classList.remove("show"), 1400);
+    }
+
+    function clearOptionStyles(){
+      [...options.querySelectorAll(".opt")].forEach(b=>{
+        b.classList.remove("correct","wrong");
+        b.disabled = false;
+        b.style.opacity = "1";
+      });
+    }
+
+    function removeOneWrongOption(){
+      if(state.usedPrecedent) return;
+
+      const wrongIndices = [0,1,2,3].filter(i => i !== state.currentQ.answerIndex);
+      const removeIndex = wrongIndices[Math.floor(Math.random()*wrongIndices.length)];
+      state.removedOptionIndex = removeIndex;
+
+      const btns = [...options.querySelectorAll(".opt")];
+      btns.forEach((b, idx)=>{
+        if(idx === removeIndex){
+          b.disabled = true;
+          b.style.opacity = ".45";
+          b.querySelector("small").textContent = "Removed by precedent reference";
+        }
+      });
+
+      state.usedPrecedent = true;
+      btnPrecedent.disabled = true;
+      showToast("Precedent used: one wrong option removed");
+    }
+
+    function scoreForCorrect(){
+      // +10 always; +5 extra when streak is >= 3 after applying the correct answer.
+      let base = 10;
+      let bonus = (state.streak >= 3) ? 5 : 0;
+      return base + bonus;
+    }
+
+    function logAttempt(entry){
+      state.attemptLog.push({
+        ts: new Date().toISOString(),
+        ...entry
+      });
+    }
+
+    function downloadJSON(filename, obj){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 800);
+    }
+
+    /***********************
+     * 5) FLOW
+     ***********************/
+    function goIntro(){
+      screenTitle.textContent = "Welcome";
+      screenSub.textContent = "A lightweight, mobile-friendly courtroom learning game.";
+      resetVerdictVisuals();
+      setScreen(scrIntro);
+      updateHUD();
+    }
+
+    function goRules(){
+      screenTitle.textContent = "Rules";
+      screenSub.textContent = "Clear, low-cognitive-load gameplay.";
+      resetVerdictVisuals();
+      setScreen(scrRules);
+      updateHUD();
+    }
+
+    function startGame(){
+      // Reset state
+      state.currentIndex = 0;
+      state.score = 0;
+      state.bails = 0;
+      state.streak = 0;
+      state.maxStreak = 0;
+      state.usedPrecedent = false;
+      state.usedAppeal = false;
+      state.appealActive = false;
+      state.currentQ = null;
+      state.removedOptionIndex = null;
+      state.selectedIndex = null;
+      state.attemptLog = [];
+
+      updateHUD();
+      nextCase();
+    }
+
+    function nextCase(){
+      resetVerdictVisuals();
+
+      if(state.currentIndex >= state.totalCases){
+        return goSummary();
+      }
+
+      state.currentQ = pickQuestion();
+      state.removedOptionIndex = null;
+      state.selectedIndex = null;
+      state.appealActive = false;
+
+      // UI: Case screen
+      screenTitle.textContent = `Hearing ${state.currentIndex+1}`;
+      screenSub.textContent = "Review the brief before responding to the judge.";
+      caseBrief.textContent = genCaseBrief();
+
+      setScreen(scrCase);
+      updateHUD();
+    }
+
+    function goQuestion(){
+      resetVerdictVisuals();
+
+      screenTitle.textContent = "Judge’s Question";
+      screenSub.textContent = "Choose the best answer based on the chapter concept.";
+
+      qText.textContent = state.currentQ.q;
+
+      // Meta
+      qMeta.textContent = `Topic: ${state.currentQ.topic} • Difficulty: ${state.currentQ.difficulty} • Question ID: ${state.currentQ.id}`;
+
+      // Precedent button state
+      btnPrecedent.disabled = state.usedPrecedent;
+      btnAppeal.disabled = true;
+
+      // Render options
+      options.innerHTML = "";
+      const labels = ["A","B","C","D"];
+      state.currentQ.choices.forEach((c, idx)=>{
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.type = "button";
+        b.innerHTML = `<div><b>${labels[idx]}.</b> ${escapeHTML(c)}</div><small>Tap to submit</small>`;
+        b.addEventListener("click", () => submitAnswer(idx));
+        options.appendChild(b);
+      });
+
+      clearOptionStyles();
+      setScreen(scrQuestion);
+      updateHUD();
+    }
+
+    function submitAnswer(selectedIndex){
+      // If removed option somehow clicked, ignore
+      if(state.removedOptionIndex === selectedIndex) return;
+
+      state.selectedIndex = selectedIndex;
+
+      // Lock choices immediately (no rapid tapping)
+      [...options.querySelectorAll(".opt")].forEach(b => b.disabled = true);
+
+      const correct = selectedIndex === state.currentQ.answerIndex;
+
+      // If wrong and appeal not used and not already appealing -> allow appeal
+      if(!correct && !state.usedAppeal && !state.appealActive){
+        // Visual mark wrong selection lightly
+        markChoices(correct, selectedIndex);
+        btnAppeal.disabled = false;
+        state.appealActive = true;
+
+        logAttempt({
+          caseNo: state.currentIndex+1,
+          qid: state.currentQ.id,
+          topic: state.currentQ.topic,
+          difficulty: state.currentQ.difficulty,
+          selectedIndex,
+          correctIndex: state.currentQ.answerIndex,
+          correct: false,
+          usedPrecedent: state.usedPrecedent,
+          usedAppeal: true,
+          attemptType: "initial-wrong-appeal-offered"
+        });
+
+        showToast("You may use one Appeal to try again");
+        // Re-enable remaining options for appeal attempt (except the chosen wrong one and removed one)
+        setTimeout(()=>{
+          [...options.querySelectorAll(".opt")].forEach((b, idx)=>{
+            if(idx === selectedIndex) return;
+            if(idx === state.removedOptionIndex) return;
+            b.disabled = false;
+            b.querySelector("small").textContent = "Appeal attempt available";
+          });
+          btnAppeal.disabled = false;
+        }, 250);
+
+        return; // do not finalize verdict yet
+      }
+
+      // Final verdict
+      finalizeVerdict(correct, selectedIndex, state.appealActive ? "appeal" : "normal");
+    }
+
+    function useAppeal(){
+      if(state.usedAppeal || !state.appealActive) return;
+
+      state.usedAppeal = true;
+      btnAppeal.disabled = true;
+      showToast("Appeal activated: choose again");
+
+      // Keep the initial wrong selection disabled; other available choices are enabled by submitAnswer()
+      // No further action needed here.
+    }
+
+    function finalizeVerdict(correct, selectedIndex, mode){
+      // Mark correct/wrong
+      markChoices(correct, selectedIndex);
+
+      // Update score/streak
+      let awarded = 0;
+
+      if(correct){
+        state.streak += 1;
+        state.maxStreak = Math.max(state.maxStreak, state.streak);
+
+        awarded = scoreForCorrect();
+        state.score += awarded;
+        state.bails += 1;
+
+        verdictText.textContent = `Bail granted. You earned ${awarded} points.`;
+        feedback.textContent = state.currentQ.feedbackCorrect;
+
+        tapGavel();
+        popStamp(true);
+        fireConfetti();
+
+      } else {
+        state.streak = 0;
+        verdictText.textContent = "Bail denied. The accused is sent to judicial custody.";
+        feedback.textContent = state.currentQ.feedbackWrong;
+
+        tapGavel();
+        popStamp(false);
+      }
+
+      // Log attempt
+      logAttempt({
+        caseNo: state.currentIndex+1,
+        qid: state.currentQ.id,
+        topic: state.currentQ.topic,
+        difficulty: state.currentQ.difficulty,
+        selectedIndex,
+        correctIndex: state.currentQ.answerIndex,
+        correct,
+        usedPrecedent: state.usedPrecedent,
+        usedAppeal: state.usedAppeal,
+        attemptType: mode
+      });
+
+      updateHUD();
+
+      // Move to verdict screen after a short pause to enjoy visuals
+      setTimeout(()=>{
+        screenTitle.textContent = "Judgment";
+        screenSub.textContent = correct ? "Bail granted based on correct reasoning." : "Custody due to incorrect reasoning.";
+        setScreen(scrVerdict);
+      }, 650);
+    }
+
+    function markChoices(correct, selectedIndex){
+      const btns = [...options.querySelectorAll(".opt")];
+      const correctIdx = state.currentQ.answerIndex;
+
+      btns.forEach((b, idx)=>{
+        if(idx === correctIdx) b.classList.add("correct");
+        if(idx === selectedIndex && idx !== correctIdx) b.classList.add("wrong");
+
+        // Update helper line
+        const small = b.querySelector("small");
+        if(idx === correctIdx) small.textContent = "Correct option";
+        else if(idx === selectedIndex) small.textContent = "Your selection";
+        else small.textContent = small.textContent || "Option";
+      });
+    }
+
+    function goVerdictNext(){
+      state.currentIndex += 1;
+      nextCase();
+    }
+
+    function goSummary(){
+      resetVerdictVisuals();
+
+      screenTitle.textContent = "Session Summary";
+      screenSub.textContent = "A quick overview of bails secured and learning performance.";
+
+      const accuracy = state.totalCases ? Math.round((state.bails / state.totalCases)*100) : 0;
+      sumLine.textContent = `You secured ${state.bails} bails out of ${state.totalCases}. Final score: ${state.score}.`;
+
+      sumPerf.innerHTML =
+        `• Accuracy: <b>${accuracy}%</b><br/>` +
+        `• Max streak: <b>${state.maxStreak}</b><br/>` +
+        `• Precedent used: <b>${state.usedPrecedent ? "Yes" : "No"}</b><br/>` +
+        `• Appeal used: <b>${state.usedAppeal ? "Yes" : "No"}</b><br/>`;
+
+      setScreen(scrSummary);
+      updateHUD();
+    }
+
+    function exportLog(){
+      const payload = {
+        meta: {
+          game: "Bail or Custody — Courtroom GBL",
+          version: "v1",
+          totalCases: state.totalCases,
+          exportedAt: new Date().toISOString()
+        },
+        results: {
+          score: state.score,
+          bails: state.bails,
+          maxStreak: state.maxStreak,
+          usedPrecedent: state.usedPrecedent,
+          usedAppeal: state.usedAppeal
+        },
+        attempts: state.attemptLog
+      };
+      downloadJSON(`courtroom_gbl_log_${Date.now()}.json`, payload);
+      showToast("Log exported");
+    }
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /***********************
+     * 6) EVENTS
+     ***********************/
+    btnStart.addEventListener("click", startGame);
+    btnStart2.addEventListener("click", startGame);
+    btnHow.addEventListener("click", goRules);
+    btnBackIntro.addEventListener("click", goIntro);
+
+    btnToQuestion.addEventListener("click", goQuestion);
+
+    btnPrecedent.addEventListener("click", () => removeOneWrongOption());
+    btnAppeal.addEventListener("click", useAppeal);
+
+    btnNext.addEventListener("click", goVerdictNext);
+
+    btnPlayAgain.addEventListener("click", startGame);
+
+    btnRestart.addEventListener("click", goIntro);
+    btnExport.addEventListener("click", exportLog);
+    btnExport2.addEventListener("click", exportLog);
+
+    // Start at intro
+    goIntro();
+  </script>
+</body>
+</html>
