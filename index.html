@@ -3,16 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.1)</title>
+  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.2)</title>
   <style>
     :root{
       --bg1:#070b16;
       --bg2:#0b1430;
-      --panel:rgba(255,255,255,.06);
       --stroke:rgba(255,255,255,.12);
       --ink:#eef3ff;
       --muted:#aebbe0;
-      --accent:#6aa6ff;
       --good:#31d07c;
       --bad:#ff5d6c;
       --gold:#ffd66a;
@@ -47,6 +45,7 @@
       gap:10px;
     }
 
+    /* HUD */
     .hud{
       height: var(--hudH);
       display:flex;
@@ -89,6 +88,7 @@
     .pill b{font-size:12.5px}
     .pill span{font-size:12px;color:var(--muted);font-weight:700}
 
+    /* Main stage */
     .stage{
       position:relative;
       flex:1 1 auto;
@@ -103,6 +103,7 @@
       overflow:hidden;
     }
 
+    /* Scene */
     .scene{position:absolute; inset:0 0 var(--quizH) 0; padding:12px;}
     .sceneInner{
       position:relative;
@@ -167,6 +168,7 @@
       overflow:hidden;
     }
 
+    /* Characters */
     .char{
       position:absolute;
       bottom:86px;
@@ -178,25 +180,58 @@
     .lawyer{left:18px}
     .client{right:18px}
 
+    /* Role labels */
+    .roleTag{
+      position:absolute;
+      left:50%;
+      transform: translateX(-50%);
+      top:-14px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.30);
+      backdrop-filter: blur(10px);
+      color: rgba(255,255,255,.92);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      box-shadow: 0 12px 22px rgba(0,0,0,.22);
+      pointer-events:none;
+    }
+    .roleTag small{color:var(--muted); font-weight:800; margin-left:6px}
+    .roleTag.judge{top:6px}
+
     @media (max-width: 520px){
       :root{ --quizH: 310px; }
       .char{width:150px;height:185px; bottom:84px}
       .lawyer{left:6px}
       .client{right:6px}
       .bench{top:46px;height:155px}
+      .roleTag{font-size:11.5px}
     }
 
+    /* Judge */
+    .judgeWrap{
+      position:absolute;
+      left:50%;
+      transform: translateX(-50%);
+      top:0;
+      width:240px;
+      height:240px;
+      pointer-events:none;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
+    }
     .judge{
       position:absolute;
       left:50%;
       transform: translateX(-50%);
-      top:6px;
+      top:10px;
       width:210px;
       height:220px;
-      pointer-events:none;
-      filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
     }
 
+    /* Gavel */
     .gavel{
       position:absolute;
       top:88px;
@@ -206,6 +241,7 @@
       transform-origin: 60% 60%;
       opacity:.95;
       filter: drop-shadow(0 14px 18px rgba(0,0,0,.35));
+      pointer-events:none;
     }
     .gavel.tap{animation: gavelTap .42s ease}
     @keyframes gavelTap{
@@ -214,7 +250,26 @@
       65%{transform: rotate(10deg) translateY(2px)}
       100%{transform: rotate(0deg) translateY(0)}
     }
+    /* Gavel spark */
+    .gavelSpark{
+      position:absolute;
+      right:42px;
+      top:128px;
+      width:10px;height:10px;
+      border-radius: 999px;
+      background: rgba(255,214,106,.95);
+      box-shadow: 0 0 18px rgba(255,214,106,.85);
+      opacity:0;
+      pointer-events:none;
+    }
+    .gavelSpark.show{animation: spark .32s ease}
+    @keyframes spark{
+      0%{opacity:0; transform: scale(.6)}
+      35%{opacity:1; transform: scale(1.8)}
+      100%{opacity:0; transform: scale(2.2)}
+    }
 
+    /* Verdict screen */
     .verdictScreen{
       position:absolute;
       inset:0;
@@ -236,6 +291,7 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 22px 50px rgba(0,0,0,.45);
       overflow:hidden;
+      position:relative;
     }
     .verdictTop{
       padding:14px;
@@ -257,14 +313,26 @@
       line-height:1.4;
     }
     .verdictActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:14px; border-top:1px solid rgba(255,255,255,.10)}
+    .sealCorner{
+      position:absolute;
+      right:14px;
+      bottom:64px;
+      width:86px;
+      height:86px;
+      opacity:.92;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.35));
+      pointer-events:none;
+      transform: rotate(-8deg);
+    }
 
+    /* Scene stamp with seal */
     .stamp{
       position:absolute;
       left:50%;
       top:52%;
       transform: translate(-50%,-50%) rotate(-8deg) scale(.9);
-      padding:10px 14px;
-      border-radius: 16px;
+      padding:12px 14px;
+      border-radius: 18px;
       border:2px dashed rgba(255,255,255,.35);
       background: rgba(0,0,0,.30);
       font-weight:950;
@@ -273,7 +341,16 @@
       display:none;
       box-shadow: 0 18px 40px rgba(0,0,0,.35);
       z-index: 10;
+      width:min(360px, 92%);
     }
+    .stampRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .stampText{font-size:14px}
+    .stampSub{margin-top:6px; font-size:12px; color:var(--muted); font-weight:800; letter-spacing:.2px}
     .stamp.good{color: rgba(49,208,124,.98); border-color: rgba(49,208,124,.8)}
     .stamp.bad{color: rgba(255,93,108,.98); border-color: rgba(255,93,108,.8)}
     .stamp.show{display:block; animation: stampPop .48s ease}
@@ -282,40 +359,166 @@
       65%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1.06)}
       100%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1)}
     }
+    .seal{
+      width:74px;height:74px; flex:0 0 auto;
+      opacity:.95;
+    }
 
+    /* Confetti */
     .confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; display:none; z-index: 11;}
     .confetti.show{display:block}
     .confetti i{position:absolute; top:-10%; width:10px; height:16px; border-radius: 3px; opacity:.92; animation: fall 1.15s linear forwards;}
     @keyframes fall{0%{transform: translateY(-10vh) rotate(0deg); opacity:1} 100%{transform: translateY(120vh) rotate(260deg); opacity:.88}}
 
+    /* Custody (more impressive) */
     .custodyOverlay{
       position:absolute;
-      right:12px;
-      bottom:78px;
-      width:190px;
-      height:230px;
+      right:10px;
+      bottom:72px;
+      width:220px;
+      height:250px;
       pointer-events:none;
       opacity:0;
-      transform: translateX(20px);
+      transform: translateX(26px);
       z-index: 12;
     }
-    @media (max-width:520px){.custodyOverlay{width:165px;height:210px; right:4px}}
-    .custodyOverlay.show{opacity:1; transform: translateX(0); animation: custodyIn .38s ease;}
+    @media (max-width:520px){.custodyOverlay{width:190px;height:230px; right:4px}}
+    .custodyOverlay.show{
+      opacity:1;
+      transform: translateX(0);
+      animation: custodyIn .38s ease;
+    }
     @keyframes custodyIn{from{opacity:0; transform: translateX(30px) scale(.98)} to{opacity:1; transform: translateX(0) scale(1)}}
-    .barsFrame{position:absolute; inset:0; border-radius: 22px; background: rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.10); box-shadow: 0 18px 40px rgba(0,0,0,.35); overflow:hidden;}
+
+    /* siren flash */
+    .sirenFlash{
+      position:absolute; inset:0;
+      border-radius: 22px;
+      opacity:0;
+      background:
+        radial-gradient(220px 180px at 25% 15%, rgba(60,150,255,.22), transparent 55%),
+        radial-gradient(220px 180px at 75% 15%, rgba(255,80,110,.22), transparent 55%);
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    .custodyOverlay.show .sirenFlash{
+      animation: siren 1.2s ease-in-out 1;
+    }
+    @keyframes siren{
+      0%{opacity:0}
+      15%{opacity:1}
+      30%{opacity:.25}
+      45%{opacity:1}
+      60%{opacity:.25}
+      75%{opacity:1}
+      100%{opacity:0}
+    }
+
+    .barsFrame{
+      position:absolute; inset:0;
+      border-radius: 22px;
+      background: rgba(0,0,0,.34);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 40px rgba(0,0,0,.42);
+      overflow:hidden;
+    }
     .bars{
       position:absolute; inset:0;
-      background: repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0, rgba(255,255,255,.16) 7px, rgba(0,0,0,.20) 7px, rgba(0,0,0,.20) 18px);
-      opacity:.75;
-      transform: translateY(-100%);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.18) 0,
+          rgba(255,255,255,.18) 8px,
+          rgba(0,0,0,.22) 8px,
+          rgba(0,0,0,.22) 20px
+        );
+      opacity:.82;
+      transform: translateY(-120%);
     }
-    .custodyOverlay.show .bars{animation: barsDrop .55s ease forwards;}
+    .custodyOverlay.show .bars{animation: barsDrop .55s cubic-bezier(.2,.85,.2,1) forwards;}
     @keyframes barsDrop{to{transform: translateY(0)}}
+
+    /* escort silhouettes */
+    .escort{
+      position:absolute;
+      left:0; right:0;
+      bottom:54px;
+      height:120px;
+      opacity:0;
+      transform: translateX(18px);
+      pointer-events:none;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      padding:0 10px;
+      gap:8px;
+    }
+    .custodyOverlay.show .escort{
+      opacity:1;
+      transform: translateX(0);
+      animation: escortIn .55s ease forwards;
+    }
+    @keyframes escortIn{
+      0%{opacity:0; transform: translateX(22px)}
+      100%{opacity:1; transform: translateX(0)}
+    }
+    .cop{
+      width:54px; height:110px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 40% 20%, rgba(255,255,255,.18), transparent 55%),
+        linear-gradient(180deg, rgba(70,120,255,.55), rgba(10,10,18,.75));
+      border:1px solid rgba(255,255,255,.10);
+      position:relative;
+      box-shadow: 0 10px 18px rgba(0,0,0,.25);
+    }
+    .cop:before{
+      content:"";
+      position:absolute;
+      left:50%; top:10px;
+      width:24px; height:24px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(240,240,255,.35);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .cop:after{
+      content:"";
+      position:absolute;
+      left:50%; top:38px;
+      width:34px; height:12px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(255,214,106,.35);
+      border:1px solid rgba(255,255,255,.10);
+      opacity:.8;
+    }
+
+    .cuffs{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform: translateX(-50%);
+      width:72px;height:34px;
+      opacity:0;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.30));
+    }
+    .custodyOverlay.show .cuffs{
+      opacity:1;
+      animation: cuffsPop .55s ease .12s forwards;
+    }
+    @keyframes cuffsPop{
+      0%{transform: translateX(-50%) scale(.6); opacity:0}
+      60%{transform: translateX(-50%) scale(1.15); opacity:1}
+      100%{transform: translateX(-50%) scale(1); opacity:1}
+    }
+
     .custodyTag{
       position:absolute; left:12px; right:12px; bottom:12px;
-      padding:10px 12px; border-radius: 16px;
+      padding:10px 12px;
+      border-radius: 16px;
       border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.35);
+      background: rgba(0,0,0,.45);
       color: rgba(255,93,108,.95);
       font-weight:950;
       text-transform: uppercase;
@@ -323,11 +526,27 @@
       font-size: 12px;
       text-align:center;
     }
+    .custodySmall{
+      position:absolute;
+      left:12px; right:12px;
+      bottom:46px;
+      padding:8px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-weight:800;
+      font-size:12px;
+      text-align:center;
+      opacity:.95;
+    }
 
+    /* Bail: client walks out */
     .client.walkOut{ animation: walkOut 1.1s ease forwards; }
     @keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-18px) scale(1.02)} 100%{transform: translateX(-180px) scale(1.02); opacity:0}}
     @media (max-width:520px){@keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-14px) scale(1.02)} 100%{transform: translateX(-140px) scale(1.02); opacity:0}}}
 
+    /* Quiz panel */
     .quiz{
       position:absolute;
       left:0; right:0; bottom:0;
@@ -408,6 +627,7 @@
     .opt.correct{border-color: rgba(49,208,124,.75); background: rgba(49,208,124,.10)}
     .opt.wrong{border-color: rgba(255,93,108,.75); background: rgba(255,93,108,.10)}
 
+    /* Intro overlay */
     .intro{
       position:absolute; inset:0;
       display:flex;
@@ -442,6 +662,7 @@
     }
     .introActions{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 
+    /* Toast */
     .toast{
       position:fixed;
       left:50%;
@@ -486,6 +707,7 @@
     </div>
 
     <div class="stage">
+
       <div class="scene">
         <div class="sceneInner">
           <div class="caseLabel">
@@ -497,105 +719,114 @@
 
           <div class="bench"></div>
 
-          <!-- Judge -->
-          <svg class="judge" viewBox="0 0 220 240" aria-hidden="true">
-            <defs>
-              <linearGradient id="jg_robe" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#222433" stop-opacity=".98"/>
-                <stop offset="1" stop-color="#0d0e14" stop-opacity=".96"/>
-              </linearGradient>
-              <radialGradient id="jg_face" cx=".35" cy=".35" r=".75">
-                <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
-                <stop offset=".55" stop-color="#e6d4bf" stop-opacity=".96"/>
-                <stop offset="1" stop-color="#bda88d" stop-opacity=".92"/>
-              </radialGradient>
-              <linearGradient id="jg_wig" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#f5f5ff" stop-opacity=".98"/>
-                <stop offset="1" stop-color="#cfd2ee" stop-opacity=".86"/>
-              </linearGradient>
-            </defs>
-            <path d="M60 52 C60 25, 160 25, 160 52
-                     C170 60, 178 78, 170 96
-                     C162 110, 58 110, 50 96
-                     C40 78, 48 60, 60 52Z"
-                  fill="url(#jg_wig)" opacity=".95"/>
-            <circle cx="110" cy="78" r="32" fill="url(#jg_face)" stroke="rgba(0,0,0,.14)" stroke-width="1"/>
-            <circle cx="98" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
-            <circle cx="122" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
-            <path d="M98 92 Q110 102 122 92" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M70 112
-                     C78 104, 92 98, 110 98
-                     C128 98, 142 104, 150 112
-                     L166 196
-                     C140 214, 80 214, 54 196Z"
-                  fill="url(#jg_robe)" stroke="rgba(255,255,255,.08)" stroke-width="1.2"/>
-            <rect x="86" y="140" width="48" height="8" rx="8" fill="rgba(255,214,106,.85)" opacity=".65"/>
-          </svg>
+          <!-- Judge + label -->
+          <div class="judgeWrap" aria-hidden="true">
+            <div class="roleTag judge">Judge <small>(Court)</small></div>
+            <svg class="judge" viewBox="0 0 220 240">
+              <defs>
+                <linearGradient id="jg_robe" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#222433" stop-opacity=".98"/>
+                  <stop offset="1" stop-color="#0d0e14" stop-opacity=".96"/>
+                </linearGradient>
+                <radialGradient id="jg_face" cx=".35" cy=".35" r=".75">
+                  <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+                  <stop offset=".55" stop-color="#e6d4bf" stop-opacity=".96"/>
+                  <stop offset="1" stop-color="#bda88d" stop-opacity=".92"/>
+                </radialGradient>
+                <linearGradient id="jg_wig" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#f5f5ff" stop-opacity=".98"/>
+                  <stop offset="1" stop-color="#cfd2ee" stop-opacity=".86"/>
+                </linearGradient>
+              </defs>
+              <path d="M60 52 C60 25, 160 25, 160 52
+                       C170 60, 178 78, 170 96
+                       C162 110, 58 110, 50 96
+                       C40 78, 48 60, 60 52Z"
+                    fill="url(#jg_wig)" opacity=".95"/>
+              <circle cx="110" cy="78" r="32" fill="url(#jg_face)" stroke="rgba(0,0,0,.14)" stroke-width="1"/>
+              <circle cx="98" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
+              <circle cx="122" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
+              <path d="M98 92 Q110 102 122 92" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M70 112
+                       C78 104, 92 98, 110 98
+                       C128 98, 142 104, 150 112
+                       L166 196
+                       C140 214, 80 214, 54 196Z"
+                    fill="url(#jg_robe)" stroke="rgba(255,255,255,.08)" stroke-width="1.2"/>
+              <rect x="86" y="140" width="48" height="8" rx="8" fill="rgba(255,214,106,.85)" opacity=".65"/>
+            </svg>
+          </div>
 
-          <!-- Lawyer -->
-          <svg class="char lawyer" viewBox="0 0 180 220" aria-hidden="true">
-            <defs>
-              <radialGradient id="lw_face" cx=".35" cy=".35" r=".75">
-                <stop offset="0" stop-color="#ffffff" stop-opacity=".30"/>
-                <stop offset=".55" stop-color="#ead7c2" stop-opacity=".96"/>
-                <stop offset="1" stop-color="#c3a78a" stop-opacity=".92"/>
-              </radialGradient>
-              <linearGradient id="lw_suit" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#7db7ff" stop-opacity=".98"/>
-                <stop offset="1" stop-color="#2b4aa7" stop-opacity=".92"/>
-              </linearGradient>
-              <linearGradient id="lw_hair" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#23263a" stop-opacity=".95"/>
-                <stop offset="1" stop-color="#0e0f16" stop-opacity=".95"/>
-              </linearGradient>
-            </defs>
-            <rect x="110" y="140" width="38" height="52" rx="10" fill="rgba(255,214,106,.85)" opacity=".65" stroke="rgba(255,255,255,.10)"/>
-            <circle cx="78" cy="70" r="26" fill="url(#lw_face)" stroke="rgba(0,0,0,.12)"/>
-            <path d="M52 72 C54 45, 102 42, 106 70
-                     C98 58, 78 54, 60 62
-                     C56 66, 54 70, 52 72Z"
-                  fill="url(#lw_hair)" opacity=".98"/>
-            <path d="M40 102
-                     C50 92, 64 86, 78 86
-                     C92 86, 106 92, 116 102
-                     L132 198
-                     C104 214, 52 214, 24 198Z"
-                  fill="url(#lw_suit)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
-            <path d="M78 98 L88 118 L78 132 L68 118 Z" fill="rgba(255,255,255,.22)"/>
-            <path d="M78 132 L90 180 L66 180 Z" fill="rgba(255,255,255,.14)"/>
-          </svg>
+          <!-- Lawyer + label -->
+          <div class="char lawyer" aria-hidden="true">
+            <div class="roleTag">Lawyer <small>(Defence)</small></div>
+            <svg viewBox="0 0 180 220" width="100%" height="100%">
+              <defs>
+                <radialGradient id="lw_face" cx=".35" cy=".35" r=".75">
+                  <stop offset="0" stop-color="#ffffff" stop-opacity=".30"/>
+                  <stop offset=".55" stop-color="#ead7c2" stop-opacity=".96"/>
+                  <stop offset="1" stop-color="#c3a78a" stop-opacity=".92"/>
+                </radialGradient>
+                <linearGradient id="lw_suit" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#7db7ff" stop-opacity=".98"/>
+                  <stop offset="1" stop-color="#2b4aa7" stop-opacity=".92"/>
+                </linearGradient>
+                <linearGradient id="lw_hair" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#23263a" stop-opacity=".95"/>
+                  <stop offset="1" stop-color="#0e0f16" stop-opacity=".95"/>
+                </linearGradient>
+              </defs>
+              <rect x="110" y="140" width="38" height="52" rx="10" fill="rgba(255,214,106,.85)" opacity=".65" stroke="rgba(255,255,255,.10)"/>
+              <circle cx="78" cy="70" r="26" fill="url(#lw_face)" stroke="rgba(0,0,0,.12)"/>
+              <path d="M52 72 C54 45, 102 42, 106 70
+                       C98 58, 78 54, 60 62
+                       C56 66, 54 70, 52 72Z"
+                    fill="url(#lw_hair)" opacity=".98"/>
+              <path d="M40 102
+                       C50 92, 64 86, 78 86
+                       C92 86, 106 92, 116 102
+                       L132 198
+                       C104 214, 52 214, 24 198Z"
+                    fill="url(#lw_suit)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
+              <path d="M78 98 L88 118 L78 132 L68 118 Z" fill="rgba(255,255,255,.22)"/>
+              <path d="M78 132 L90 180 L66 180 Z" fill="rgba(255,255,255,.14)"/>
+            </svg>
+          </div>
 
-          <!-- Client -->
-          <svg class="char client" id="clientSvg" viewBox="0 0 180 220" aria-hidden="true">
-            <defs>
-              <radialGradient id="cl_face" cx=".35" cy=".35" r=".75">
-                <stop offset="0" stop-color="#ffffff" stop-opacity=".30"/>
-                <stop offset=".55" stop-color="#ead7c2" stop-opacity=".96"/>
-                <stop offset="1" stop-color="#c3a78a" stop-opacity=".92"/>
-              </radialGradient>
-              <linearGradient id="cl_shirt" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#ff86a4" stop-opacity=".92"/>
-                <stop offset="1" stop-color="#7b2140" stop-opacity=".88"/>
-              </linearGradient>
-              <linearGradient id="cl_hair" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#2a2a2f" stop-opacity=".95"/>
-                <stop offset="1" stop-color="#0f0f14" stop-opacity=".95"/>
-              </linearGradient>
-            </defs>
-            <circle cx="100" cy="72" r="26" fill="url(#cl_face)" stroke="rgba(0,0,0,.12)"/>
-            <path d="M78 72 C80 46, 128 44, 130 72
-                     C118 58, 96 56, 82 64
-                     C80 66, 79 69, 78 72Z"
-                  fill="url(#cl_hair)" opacity=".98"/>
-            <path d="M62 102
-                     C72 92, 86 86, 100 86
-                     C114 86, 128 92, 138 102
-                     L154 198
-                     C126 214, 74 214, 46 198Z"
-                  fill="url(#cl_shirt)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
-            <circle cx="62" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
-            <circle cx="144" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
-          </svg>
+          <!-- Client + label -->
+          <div class="char client" id="clientWrap" aria-hidden="true">
+            <div class="roleTag">Client <small>(Accused)</small></div>
+            <svg id="clientSvg" viewBox="0 0 180 220" width="100%" height="100%">
+              <defs>
+                <radialGradient id="cl_face" cx=".35" cy=".35" r=".75">
+                  <stop offset="0" stop-color="#ffffff" stop-opacity=".30"/>
+                  <stop offset=".55" stop-color="#ead7c2" stop-opacity=".96"/>
+                  <stop offset="1" stop-color="#c3a78a" stop-opacity=".92"/>
+                </radialGradient>
+                <linearGradient id="cl_shirt" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ff86a4" stop-opacity=".92"/>
+                  <stop offset="1" stop-color="#7b2140" stop-opacity=".88"/>
+                </linearGradient>
+                <linearGradient id="cl_hair" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#2a2a2f" stop-opacity=".95"/>
+                  <stop offset="1" stop-color="#0f0f14" stop-opacity=".95"/>
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="72" r="26" fill="url(#cl_face)" stroke="rgba(0,0,0,.12)"/>
+              <path d="M78 72 C80 46, 128 44, 130 72
+                       C118 58, 96 56, 82 64
+                       C80 66, 79 69, 78 72Z"
+                    fill="url(#cl_hair)" opacity=".98"/>
+              <path d="M62 102
+                       C72 92, 86 86, 100 86
+                       C114 86, 128 92, 138 102
+                       L154 198
+                       C126 214, 74 214, 46 198Z"
+                    fill="url(#cl_shirt)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
+              <circle cx="62" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
+              <circle cx="144" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
+            </svg>
+          </div>
 
           <!-- Gavel -->
           <svg class="gavel" id="gavel" viewBox="0 0 120 120" aria-hidden="true">
@@ -609,19 +840,49 @@
             <rect x="40" y="42" width="60" height="18" rx="12" fill="url(#gv)" stroke="rgba(255,255,255,.12)"
                   transform="rotate(35 40 42)"/>
           </svg>
+          <div class="gavelSpark" id="gavelSpark"></div>
 
+          <!-- Scene stamp (with seal) -->
           <div class="stamp" id="stamp"></div>
+
           <div class="confetti" id="confetti"></div>
 
+          <!-- Custody overlay (upgraded) -->
           <div class="custodyOverlay" id="custodyOverlay" aria-hidden="true">
-            <div class="barsFrame"><div class="bars"></div></div>
-            <div class="custodyTag">Judicial Custody</div>
+            <div class="barsFrame">
+              <div class="sirenFlash"></div>
+              <div class="bars"></div>
+              <div class="escort">
+                <div class="cop"></div>
+                <div class="cop" style="opacity:.85"></div>
+              </div>
+
+              <!-- handcuffs icon -->
+              <svg class="cuffs" viewBox="0 0 120 60">
+                <defs>
+                  <linearGradient id="cu" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="rgba(255,255,255,.35)"/>
+                    <stop offset="1" stop-color="rgba(255,255,255,.12)"/>
+                  </linearGradient>
+                </defs>
+                <g fill="none" stroke="url(#cu)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M28 36 a18 18 0 1 1 36 0 a18 18 0 1 1 -36 0" />
+                  <path d="M56 36 h8" />
+                  <path d="M56 28 h12" />
+                  <path d="M72 36 a18 18 0 1 1 36 0 a18 18 0 1 1 -36 0" />
+                </g>
+              </svg>
+
+              <div class="custodySmall">Escorted to lock-up</div>
+              <div class="custodyTag">Judicial Custody</div>
+            </div>
           </div>
 
           <div class="floor"></div>
         </div>
       </div>
 
+      <!-- Quiz -->
       <div class="quiz">
         <div class="quizTop">
           <div>
@@ -629,6 +890,7 @@
             <p id="quizSub">Start the hearings. One attempt per question.</p>
           </div>
           <div class="btnRow">
+            <button class="btn" id="btnSound">Sound: On</button>
             <button class="btn" id="btnRestart">Restart</button>
             <button class="btn warn" id="btnExport">Export Log</button>
           </div>
@@ -646,6 +908,7 @@
         </div>
       </div>
 
+      <!-- Verdict screen -->
       <div class="verdictScreen" id="verdictScreen" role="dialog" aria-modal="true">
         <div class="verdictCard">
           <div class="verdictTop">
@@ -657,15 +920,34 @@
               <b>Points</b> <span id="verdictPoints">0</span>
             </div>
           </div>
+
           <div class="verdictBody">
             <div class="feedbackBox" id="verdictFeedback">Feedback appears here.</div>
           </div>
+
+          <!-- Corner seal -->
+          <svg class="sealCorner" viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <radialGradient id="sg" cx=".35" cy=".35" r=".75">
+                <stop offset="0" stop-color="rgba(255,255,255,.22)"/>
+                <stop offset=".55" stop-color="rgba(255,214,106,.40)"/>
+                <stop offset="1" stop-color="rgba(255,214,106,.12)"/>
+              </radialGradient>
+            </defs>
+            <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,214,106,.55)" stroke-width="6"/>
+            <circle cx="60" cy="60" r="36" fill="url(#sg)" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+            <path d="M60 36 L67 54 L86 54 L70 65 L76 84 L60 73 L44 84 L50 65 L34 54 L53 54 Z"
+                  fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+            <text x="60" y="104" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,214,106,.85)">COURT SEAL</text>
+          </svg>
+
           <div class="verdictActions">
             <button class="btn primary" id="btnNext">Next Case</button>
           </div>
         </div>
       </div>
 
+      <!-- Intro overlay (teacher note removed) -->
       <div class="intro" id="intro">
         <div class="introCard">
           <div class="introTop">
@@ -683,10 +965,6 @@
               • Wrong: 0 points and custody animation.<br/>
               • Scene + MCQ stay on the same screen for smartphones.
             </div>
-            <div class="ruleBox">
-              <b>Teacher note</b><br/>
-              Replace the sample question bank in <code>QUESTION_BANK</code> with MCQs from your uploaded chapter.
-            </div>
           </div>
           <div class="introActions">
             <button class="btn primary" id="btnIntroStart">Start Hearings</button>
@@ -703,7 +981,7 @@
     // ===== CONFIG =====
     const TOTAL_CASES = 10;
 
-    // Replace with chapter-based MCQs.
+    // Replace with your chapter-based MCQs.
     const QUESTION_BANK = [
       {
         id: "CH-Q1",
@@ -736,6 +1014,38 @@
         answerIndex: 1,
         feedbackCorrect: "Correct. Phishing is social engineering intended to deceive users into sharing credentials or sensitive data.",
         feedbackWrong: "Not correct. Phishing focuses on deception and information theft, not hardware damage or system upgrades."
+      },
+      {
+        id: "CH-Q3",
+        topic: "Controls",
+        difficulty: 2,
+        brief: "The judge asks what control best reduces harm if a password is compromised.",
+        q: "Which control most directly reduces the impact of a compromised password?",
+        choices: [
+          "Multi-factor authentication (MFA)",
+          "Defragmenting the hard disk",
+          "Increasing screen brightness",
+          "Turning off all firewalls"
+        ],
+        answerIndex: 0,
+        feedbackCorrect: "Correct. MFA adds an additional verification factor so a password alone is insufficient.",
+        feedbackWrong: "Not correct. The relevant idea is adding an extra factor beyond the password."
+      },
+      {
+        id: "CH-Q4",
+        topic: "Malware",
+        difficulty: 2,
+        brief: "A device was locked and access was demanded for payment. The judge asks the correct term.",
+        q: "Ransomware is best described as malware that:",
+        choices: [
+          "Steals data silently without any visible effects",
+          "Encrypts files and demands payment to restore access",
+          "Only affects mobile devices and not computers",
+          "Improves system security by patching vulnerabilities"
+        ],
+        answerIndex: 1,
+        feedbackCorrect: "Correct. Ransomware commonly encrypts files and demands payment for decryption.",
+        feedbackWrong: "Not correct. The defining behavior is encryption plus extortion."
       }
     ];
 
@@ -756,7 +1066,8 @@
       bails: 0,
       current: null,
       attemptLog: [],
-      locked: false
+      locked: false,
+      soundOn: true
     };
 
     // ===== DOM =====
@@ -781,6 +1092,7 @@
     const qMeta = must("qMeta");
     const options = must("options");
 
+    const btnSound = must("btnSound");
     const btnStart = must("btnStart");
     const btnRestart = must("btnRestart");
     const btnExport = must("btnExport");
@@ -789,6 +1101,7 @@
     const btnIntroStart = must("btnIntroStart");
 
     const gavel = must("gavel");
+    const gavelSpark = must("gavelSpark");
     const stamp = must("stamp");
     const confetti = must("confetti");
 
@@ -803,6 +1116,53 @@
     const btnNext = must("btnNext");
 
     const toast = must("toast");
+
+    // ===== SOUND (gavel effect) =====
+    let audioCtx = null;
+    function ensureAudio(){
+      if(!state.soundOn) return null;
+      if(!audioCtx){
+        try{
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }catch(e){
+          audioCtx = null;
+        }
+      }
+      return audioCtx;
+    }
+    function gavelSound(){
+      const ctx = ensureAudio();
+      if(!ctx) return;
+
+      const now = ctx.currentTime;
+
+      // a short "thunk" + click: filtered noise + quick sine
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(220, now);
+      o.frequency.exponentialRampToValueAtTime(140, now + 0.06);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(now);
+      o.stop(now + 0.10);
+
+      // tiny hi-click
+      const o2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      o2.type = "triangle";
+      o2.frequency.setValueAtTime(900, now);
+      g2.gain.setValueAtTime(0.0001, now);
+      g2.gain.exponentialRampToValueAtTime(0.08, now + 0.005);
+      g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+      o2.connect(g2);
+      g2.connect(ctx.destination);
+      o2.start(now);
+      o2.stop(now + 0.04);
+    }
 
     // ===== HELPERS =====
     function showToast(msg){
@@ -823,13 +1183,16 @@
 
     function tapGavel(){
       gavel.classList.remove("tap");
+      gavelSpark.classList.remove("show");
       void gavel.offsetWidth;
       gavel.classList.add("tap");
+      gavelSpark.classList.add("show");
+      gavelSound();
     }
 
     function resetSceneFX(){
       stamp.className = "stamp";
-      stamp.textContent = "";
+      stamp.innerHTML = "";
       confetti.className = "confetti";
       confetti.innerHTML = "";
       custodyOverlay.classList.remove("show");
@@ -847,9 +1210,40 @@
       }
     }
 
+    function sealSVG(labelTop, labelBottom){
+      return `
+        <svg class="seal" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <radialGradient id="sealG" cx=".35" cy=".35" r=".75">
+              <stop offset="0" stop-color="rgba(255,255,255,.22)"/>
+              <stop offset=".55" stop-color="rgba(255,214,106,.40)"/>
+              <stop offset="1" stop-color="rgba(255,214,106,.12)"/>
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,214,106,.55)" stroke-width="6"/>
+          <circle cx="60" cy="60" r="36" fill="url(#sealG)" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+          <path d="M60 36 L67 54 L86 54 L70 65 L76 84 L60 73 L44 84 L50 65 L34 54 L53 54 Z"
+                fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+          <text x="60" y="22" text-anchor="middle" font-size="10.5" font-weight="900" fill="rgba(255,214,106,.9)">${labelTop}</text>
+          <text x="60" y="106" text-anchor="middle" font-size="10.5" font-weight="900" fill="rgba(255,214,106,.9)">${labelBottom}</text>
+        </svg>
+      `;
+    }
+
     function popStamp(isGood){
       stamp.className = "stamp " + (isGood ? "good" : "bad") + " show";
-      stamp.textContent = isGood ? "BAIL GRANTED" : "JUDICIAL CUSTODY";
+      const big = isGood ? "BAIL GRANTED" : "JUDICIAL CUSTODY";
+      const sub = isGood ? "Order: Release on conditions" : "Order: Remand to custody";
+      const seal = sealSVG("COURT", "SEAL");
+      stamp.innerHTML = `
+        <div class="stampRow">
+          <div>
+            <div class="stampText">${big}</div>
+            <div class="stampSub">${sub}</div>
+          </div>
+          ${seal}
+        </div>
+      `;
     }
 
     function fireConfetti(){
@@ -1020,16 +1414,18 @@
         setTimeout(()=> clientSvg.classList.add("walkOut"), 220);
 
         verdictTitle.textContent = "Bail Granted";
-        verdictLine.textContent = "Good argument. You earned " + points + " points.";
+        verdictLine.textContent = "Order passed. You earned " + points + " points.";
         verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackCorrect;
       } else {
         points = 0;
+
         popStamp(false);
-        setTimeout(()=> custodyOverlay.classList.add("show"), 180);
+        // stronger custody reveal
+        setTimeout(()=> custodyOverlay.classList.add("show"), 150);
 
         verdictTitle.textContent = "Judicial Custody";
-        verdictLine.textContent = "Bail denied due to incorrect reasoning.";
+        verdictLine.textContent = "Bail denied. Remand ordered.";
         verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackWrong;
       }
@@ -1066,7 +1462,7 @@
       const payload = {
         meta: {
           game: "Courtroom Bail GBL",
-          version: "v2.1 (robust init + safe escape + one attempt)",
+          version: "v2.2 (labels + seal + stronger custody + gavel sound)",
           totalCases: state.totalCases,
           exportedAt: new Date().toISOString()
         },
@@ -1077,16 +1473,24 @@
       showToast("Log exported");
     }
 
+    function toggleSound(){
+      state.soundOn = !state.soundOn;
+      btnSound.textContent = "Sound: " + (state.soundOn ? "On" : "Off");
+      showToast("Sound " + (state.soundOn ? "enabled" : "disabled"));
+      // if turning on, prime audio context on user gesture
+      if(state.soundOn) ensureAudio();
+    }
+
     // ===== EVENTS =====
-    btnIntroStart.addEventListener("click", startGame);
-    btnStart.addEventListener("click", startGame);
+    btnIntroStart.addEventListener("click", () => { ensureAudio(); startGame(); });
+    btnStart.addEventListener("click", () => { ensureAudio(); startGame(); });
     btnNext.addEventListener("click", goNext);
     btnRestart.addEventListener("click", resetGame);
     btnExport.addEventListener("click", exportLog);
+    btnSound.addEventListener("click", toggleSound);
 
     // ===== INIT =====
     resetGame();
-    showToast("JS Loaded");
   </script>
 </body>
 </html>
