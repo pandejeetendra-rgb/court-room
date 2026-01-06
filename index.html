@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Courtroom Bail GBL — Single-Screen Mobile (v2)</title>
+  <title>Courtroom Bail GBL — Single-Screen Mobile (v2.1)</title>
   <style>
     :root{
       --bg1:#070b16;
@@ -19,9 +19,8 @@
       --shadow: 0 12px 30px rgba(0,0,0,.35);
       --r:18px;
 
-      /* layout */
       --hudH: 60px;
-      --quizH: 290px; /* mobile-friendly; adjusts with media queries */
+      --quizH: 290px;
     }
 
     *{box-sizing:border-box}
@@ -48,7 +47,6 @@
       gap:10px;
     }
 
-    /* HUD */
     .hud{
       height: var(--hudH);
       display:flex;
@@ -57,10 +55,7 @@
       gap:10px;
       flex-wrap:wrap;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 240px;
-    }
+    .brand{display:flex; align-items:center; gap:10px; min-width: 240px;}
     .logo{
       width:44px;height:44px;border-radius:14px;
       background:
@@ -78,16 +73,10 @@
       transform: rotate(20deg);
       animation: sheen 5s linear infinite;
     }
-    @keyframes sheen{
-      0%{transform:translateX(-45%) rotate(20deg)}
-      100%{transform:translateX(75%) rotate(20deg)}
-    }
+    @keyframes sheen{0%{transform:translateX(-45%) rotate(20deg)} 100%{transform:translateX(75%) rotate(20deg)}}
     .brand h1{margin:0;font-size:16px;font-weight:900;letter-spacing:.2px}
     .brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
-    .hudRight{
-      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
-      width:100%;
-    }
+    .hudRight{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; width:100%;}
     .pill{
       display:flex; align-items:center; gap:7px;
       padding:8px 10px;
@@ -100,7 +89,6 @@
     .pill b{font-size:12.5px}
     .pill span{font-size:12px;color:var(--muted);font-weight:700}
 
-    /* Main stage */
     .stage{
       position:relative;
       flex:1 1 auto;
@@ -115,12 +103,7 @@
       overflow:hidden;
     }
 
-    /* Courtroom scene area */
-    .scene{
-      position:absolute;
-      inset:0 0 var(--quizH) 0;
-      padding:12px;
-    }
+    .scene{position:absolute; inset:0 0 var(--quizH) 0; padding:12px;}
     .sceneInner{
       position:relative;
       height:100%;
@@ -131,18 +114,13 @@
         linear-gradient(180deg, rgba(15,26,51,.5), rgba(10,16,30,.88));
       overflow:hidden;
     }
-
-    /* Wooden floor */
     .floor{
       position:absolute; left:-12%; right:-12%; bottom:-42%;
       height:74%;
-      background:
-        linear-gradient(180deg, rgba(255,214,106,.14), rgba(255,214,106,.05));
+      background: linear-gradient(180deg, rgba(255,214,106,.14), rgba(255,214,106,.05));
       transform: skewY(-6deg);
       border-top:1px solid rgba(255,255,255,.08);
     }
-
-    /* Bench */
     .bench{
       position:absolute; top:44px; left:50%;
       transform: translateX(-50%);
@@ -161,7 +139,6 @@
       background: linear-gradient(90deg, rgba(255,255,255,.14), rgba(255,255,255,.03));
     }
 
-    /* UI label above bench */
     .caseLabel{
       position:absolute;
       top:12px; left:12px; right:12px;
@@ -169,7 +146,6 @@
       pointer-events:none;
     }
     .caseBadge{
-      pointer-events:none;
       display:inline-flex;
       gap:8px;
       align-items:center;
@@ -191,7 +167,6 @@
       overflow:hidden;
     }
 
-    /* Characters (SVG containers) */
     .char{
       position:absolute;
       bottom:86px;
@@ -211,7 +186,6 @@
       .bench{top:46px;height:155px}
     }
 
-    /* Judge (center) */
     .judge{
       position:absolute;
       left:50%;
@@ -223,7 +197,6 @@
       filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
     }
 
-    /* Gavel */
     .gavel{
       position:absolute;
       top:88px;
@@ -242,7 +215,6 @@
       100%{transform: rotate(0deg) translateY(0)}
     }
 
-    /* Verdict overlay screen (NEXT SCREEN as requested) */
     .verdictScreen{
       position:absolute;
       inset:0;
@@ -273,40 +245,19 @@
       gap:10px;
       flex-wrap:wrap;
     }
-    .verdictTop h2{
-      margin:0;
-      font-size:16px;
-      font-weight:950;
-      letter-spacing:.2px;
-    }
-    .verdictTop p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:12.5px;
-      line-height:1.35;
-    }
-    .verdictBody{
-      padding:14px;
-      border-top:1px solid rgba(255,255,255,.10);
-      display:grid;
-      gap:10px;
-    }
+    .verdictTop h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px}
+    .verdictTop p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
+    .verdictBody{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:grid;gap:10px}
     .feedbackBox{
-      padding:12px;
-      border-radius: 16px;
+      padding:12px;border-radius: 16px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color: var(--muted);
       font-size:12.5px;
       line-height:1.4;
     }
-    .verdictActions{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-      padding:14px;
-      border-top:1px solid rgba(255,255,255,.10);
-    }
+    .verdictActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:14px; border-top:1px solid rgba(255,255,255,.10)}
 
-    /* Stamp + confetti on scene */
     .stamp{
       position:absolute;
       left:50%;
@@ -332,28 +283,11 @@
       100%{opacity:1; transform: translate(-50%,-50%) rotate(-8deg) scale(1)}
     }
 
-    .confetti{
-      position:absolute; inset:0;
-      pointer-events:none;
-      overflow:hidden;
-      display:none;
-      z-index: 11;
-    }
+    .confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; display:none; z-index: 11;}
     .confetti.show{display:block}
-    .confetti i{
-      position:absolute;
-      top:-10%;
-      width:10px; height:16px;
-      border-radius: 3px;
-      opacity:.92;
-      animation: fall 1.15s linear forwards;
-    }
-    @keyframes fall{
-      0%{transform: translateY(-10vh) rotate(0deg); opacity:1}
-      100%{transform: translateY(120vh) rotate(260deg); opacity:.88}
-    }
+    .confetti i{position:absolute; top:-10%; width:10px; height:16px; border-radius: 3px; opacity:.92; animation: fall 1.15s linear forwards;}
+    @keyframes fall{0%{transform: translateY(-10vh) rotate(0deg); opacity:1} 100%{transform: translateY(120vh) rotate(260deg); opacity:.88}}
 
-    /* Custody animation overlay around client */
     .custodyOverlay{
       position:absolute;
       right:12px;
@@ -365,49 +299,21 @@
       transform: translateX(20px);
       z-index: 12;
     }
-    @media (max-width:520px){
-      .custodyOverlay{width:165px;height:210px; right:4px}
-    }
-    .custodyOverlay.show{
-      opacity:1;
-      transform: translateX(0);
-      animation: custodyIn .38s ease;
-    }
-    @keyframes custodyIn{
-      from{opacity:0; transform: translateX(30px) scale(.98)}
-      to{opacity:1; transform: translateX(0) scale(1)}
-    }
-    .barsFrame{
-      position:absolute; inset:0;
-      border-radius: 22px;
-      background: rgba(0,0,0,.28);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 18px 40px rgba(0,0,0,.35);
-      overflow:hidden;
-    }
+    @media (max-width:520px){.custodyOverlay{width:165px;height:210px; right:4px}}
+    .custodyOverlay.show{opacity:1; transform: translateX(0); animation: custodyIn .38s ease;}
+    @keyframes custodyIn{from{opacity:0; transform: translateX(30px) scale(.98)} to{opacity:1; transform: translateX(0) scale(1)}}
+    .barsFrame{position:absolute; inset:0; border-radius: 22px; background: rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.10); box-shadow: 0 18px 40px rgba(0,0,0,.35); overflow:hidden;}
     .bars{
       position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,.16) 0,
-          rgba(255,255,255,.16) 7px,
-          rgba(0,0,0,.20) 7px,
-          rgba(0,0,0,.20) 18px
-        );
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0, rgba(255,255,255,.16) 7px, rgba(0,0,0,.20) 7px, rgba(0,0,0,.20) 18px);
       opacity:.75;
       transform: translateY(-100%);
     }
-    .custodyOverlay.show .bars{
-      animation: barsDrop .55s ease forwards;
-    }
-    @keyframes barsDrop{
-      to{transform: translateY(0)}
-    }
+    .custodyOverlay.show .bars{animation: barsDrop .55s ease forwards;}
+    @keyframes barsDrop{to{transform: translateY(0)}}
     .custodyTag{
       position:absolute; left:12px; right:12px; bottom:12px;
-      padding:10px 12px;
-      border-radius: 16px;
+      padding:10px 12px; border-radius: 16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.35);
       color: rgba(255,93,108,.95);
@@ -418,22 +324,10 @@
       text-align:center;
     }
 
-    /* Bail animation: client walks out */
     .client.walkOut{ animation: walkOut 1.1s ease forwards; }
-    @keyframes walkOut{
-      0%{transform: translateX(0) scale(1)}
-      35%{transform: translateX(-18px) scale(1.02)}
-      100%{transform: translateX(-180px) scale(1.02); opacity:0}
-    }
-    @media (max-width:520px){
-      @keyframes walkOut{
-        0%{transform: translateX(0) scale(1)}
-        35%{transform: translateX(-14px) scale(1.02)}
-        100%{transform: translateX(-140px) scale(1.02); opacity:0}
-      }
-    }
+    @keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-18px) scale(1.02)} 100%{transform: translateX(-180px) scale(1.02); opacity:0}}
+    @media (max-width:520px){@keyframes walkOut{0%{transform: translateX(0) scale(1)} 35%{transform: translateX(-14px) scale(1.02)} 100%{transform: translateX(-140px) scale(1.02); opacity:0}}}
 
-    /* Quiz panel: same screen for smartphone */
     .quiz{
       position:absolute;
       left:0; right:0; bottom:0;
@@ -447,31 +341,10 @@
       padding:12px;
       z-index: 20;
     }
-
-    .quizTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .quizTop h2{
-      margin:0;
-      font-size:14px;
-      font-weight:950;
-      letter-spacing:.2px;
-    }
-    .quizTop p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:12.5px;
-      line-height:1.35;
-    }
-
-    .btnRow{
-      display:flex; gap:8px; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .quizTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+    .quizTop h2{margin:0;font-size:14px;font-weight:950;letter-spacing:.2px}
+    .quizTop p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
+    .btnRow{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
 
     .btn{
       appearance:none;
@@ -507,18 +380,8 @@
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
     }
-    .qText{
-      margin:0;
-      font-size:14px;
-      font-weight:850;
-      line-height:1.35;
-    }
-    .meta{
-      margin:8px 0 0;
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-    }
+    .qText{margin:0;font-size:14px;font-weight:850;line-height:1.35}
+    .meta{margin:8px 0 0;font-size:12px;color:var(--muted);font-weight:700}
 
     .options{
       display:grid;
@@ -526,10 +389,7 @@
       gap:10px;
       margin-top:10px;
     }
-    @media (max-width:520px){
-      .options{grid-template-columns:1fr}
-    }
-
+    @media (max-width:520px){.options{grid-template-columns:1fr}}
     .opt{
       text-align:left;
       padding:12px;
@@ -544,18 +404,10 @@
     }
     .opt:hover{background: rgba(255,255,255,.10)}
     .opt:active{transform: translateY(1px)}
-    .opt small{
-      display:block;
-      margin-top:6px;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.35;
-      font-size:12px;
-    }
+    .opt small{display:block;margin-top:6px;color:var(--muted);font-weight:700;line-height:1.35;font-size:12px}
     .opt.correct{border-color: rgba(49,208,124,.75); background: rgba(49,208,124,.10)}
     .opt.wrong{border-color: rgba(255,93,108,.75); background: rgba(255,93,108,.10)}
 
-    /* Intro overlay */
     .intro{
       position:absolute; inset:0;
       display:flex;
@@ -579,28 +431,17 @@
     .introTop{padding:14px}
     .introTop h2{margin:0;font-size:16px;font-weight:950}
     .introTop p{margin:8px 0 0;color:var(--muted);font-size:12.5px;line-height:1.45}
-    .introBody{
-      padding:14px;
-      border-top:1px solid rgba(255,255,255,.10);
-      display:grid;
-      gap:10px;
-    }
+    .introBody{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:grid;gap:10px}
     .ruleBox{
-      padding:12px;
-      border-radius: 16px;
+      padding:12px;border-radius: 16px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color:var(--muted);
       font-size:12.5px;
       line-height:1.45;
     }
-    .introActions{
-      padding:14px;
-      border-top:1px solid rgba(255,255,255,.10);
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-    }
+    .introActions{padding:14px;border-top:1px solid rgba(255,255,255,.10);display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 
-    /* Toast */
     .toast{
       position:fixed;
       left:50%;
@@ -619,10 +460,7 @@
       z-index: 100;
     }
     .toast.show{display:block; animation: toastIn .22s ease}
-    @keyframes toastIn{
-      from{opacity:0; transform: translateX(-50%) translateY(8px)}
-      to{opacity:1; transform: translateX(-50%) translateY(0)}
-    }
+    @keyframes toastIn{from{opacity:0; transform: translateX(-50%) translateY(8px)} to{opacity:1; transform: translateX(-50%) translateY(0)}}
 
     @media (prefers-reduced-motion: reduce){
       *{animation:none !important; transition:none !important}
@@ -631,7 +469,6 @@
 </head>
 <body>
   <div class="app">
-
     <div class="hud">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
@@ -649,7 +486,6 @@
     </div>
 
     <div class="stage">
-      <!-- Scene -->
       <div class="scene">
         <div class="sceneInner">
           <div class="caseLabel">
@@ -661,7 +497,7 @@
 
           <div class="bench"></div>
 
-          <!-- Judge SVG -->
+          <!-- Judge -->
           <svg class="judge" viewBox="0 0 220 240" aria-hidden="true">
             <defs>
               <linearGradient id="jg_robe" x1="0" y1="0" x2="0" y2="1">
@@ -678,37 +514,25 @@
                 <stop offset="1" stop-color="#cfd2ee" stop-opacity=".86"/>
               </linearGradient>
             </defs>
-
-            <!-- Wig -->
             <path d="M60 52 C60 25, 160 25, 160 52
                      C170 60, 178 78, 170 96
                      C162 110, 58 110, 50 96
                      C40 78, 48 60, 60 52Z"
                   fill="url(#jg_wig)" opacity=".95"/>
-            <!-- Face -->
             <circle cx="110" cy="78" r="32" fill="url(#jg_face)" stroke="rgba(0,0,0,.14)" stroke-width="1"/>
-            <!-- Eyes -->
             <circle cx="98" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
             <circle cx="122" cy="76" r="3.2" fill="rgba(0,0,0,.45)"/>
-            <!-- Smile -->
             <path d="M98 92 Q110 102 122 92" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
-
-            <!-- Robe -->
             <path d="M70 112
                      C78 104, 92 98, 110 98
                      C128 98, 142 104, 150 112
                      L166 196
                      C140 214, 80 214, 54 196Z"
                   fill="url(#jg_robe)" stroke="rgba(255,255,255,.08)" stroke-width="1.2"/>
-
-            <!-- Badge -->
-            <rect x="82" y="138" width="56" height="10" rx="8"
-                  fill="url(#jg_wig)" opacity=".25"/>
-            <rect x="86" y="140" width="48" height="8" rx="8"
-                  fill="rgba(255,214,106,.85)" opacity=".65"/>
+            <rect x="86" y="140" width="48" height="8" rx="8" fill="rgba(255,214,106,.85)" opacity=".65"/>
           </svg>
 
-          <!-- Lawyer SVG -->
+          <!-- Lawyer -->
           <svg class="char lawyer" viewBox="0 0 180 220" aria-hidden="true">
             <defs>
               <radialGradient id="lw_face" cx=".35" cy=".35" r=".75">
@@ -725,43 +549,23 @@
                 <stop offset="1" stop-color="#0e0f16" stop-opacity=".95"/>
               </linearGradient>
             </defs>
-
-            <!-- Arm + folder -->
-            <path d="M40 150 C55 136, 75 130, 92 132
-                     C110 134, 120 148, 115 165
-                     C102 174, 68 180, 44 172Z"
-                  fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-            <rect x="110" y="140" width="38" height="52" rx="10"
-                  fill="rgba(255,214,106,.85)" opacity=".65" stroke="rgba(255,255,255,.10)"/>
-
-            <!-- Head -->
+            <rect x="110" y="140" width="38" height="52" rx="10" fill="rgba(255,214,106,.85)" opacity=".65" stroke="rgba(255,255,255,.10)"/>
             <circle cx="78" cy="70" r="26" fill="url(#lw_face)" stroke="rgba(0,0,0,.12)"/>
-            <!-- Hair -->
             <path d="M52 72 C54 45, 102 42, 106 70
                      C98 58, 78 54, 60 62
                      C56 66, 54 70, 52 72Z"
                   fill="url(#lw_hair)" opacity=".98"/>
-
-            <!-- Body -->
             <path d="M40 102
                      C50 92, 64 86, 78 86
                      C92 86, 106 92, 116 102
                      L132 198
                      C104 214, 52 214, 24 198Z"
                   fill="url(#lw_suit)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
-
-            <!-- Tie -->
-            <path d="M78 98 L88 118 L78 132 L68 118 Z"
-                  fill="rgba(255,255,255,.22)"/>
-            <path d="M78 132 L90 180 L66 180 Z"
-                  fill="rgba(255,255,255,.14)"/>
-
-            <!-- Small glow outline -->
-            <path d="M24 198 C52 214,104 214,132 198"
-                  fill="none" stroke="rgba(106,166,255,.22)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M78 98 L88 118 L78 132 L68 118 Z" fill="rgba(255,255,255,.22)"/>
+            <path d="M78 132 L90 180 L66 180 Z" fill="rgba(255,255,255,.14)"/>
           </svg>
 
-          <!-- Client SVG -->
+          <!-- Client -->
           <svg class="char client" id="clientSvg" viewBox="0 0 180 220" aria-hidden="true">
             <defs>
               <radialGradient id="cl_face" cx=".35" cy=".35" r=".75">
@@ -778,33 +582,22 @@
                 <stop offset="1" stop-color="#0f0f14" stop-opacity=".95"/>
               </linearGradient>
             </defs>
-
-            <!-- Head -->
             <circle cx="100" cy="72" r="26" fill="url(#cl_face)" stroke="rgba(0,0,0,.12)"/>
-            <!-- Hair -->
             <path d="M78 72 C80 46, 128 44, 130 72
                      C118 58, 96 56, 82 64
                      C80 66, 79 69, 78 72Z"
                   fill="url(#cl_hair)" opacity=".98"/>
-
-            <!-- Body -->
             <path d="M62 102
                      C72 92, 86 86, 100 86
                      C114 86, 128 92, 138 102
                      L154 198
                      C126 214, 74 214, 46 198Z"
                   fill="url(#cl_shirt)" stroke="rgba(255,255,255,.10)" stroke-width="1.2"/>
-
-            <!-- Hands -->
             <circle cx="62" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
             <circle cx="144" cy="152" r="10" fill="rgba(234,215,194,.92)" opacity=".95"/>
-
-            <!-- Glow outline -->
-            <path d="M46 198 C74 214,126 214,154 198"
-                  fill="none" stroke="rgba(255,93,108,.22)" stroke-width="3" stroke-linecap="round"/>
           </svg>
 
-          <!-- Gavel SVG -->
+          <!-- Gavel -->
           <svg class="gavel" id="gavel" viewBox="0 0 120 120" aria-hidden="true">
             <defs>
               <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
@@ -820,11 +613,8 @@
           <div class="stamp" id="stamp"></div>
           <div class="confetti" id="confetti"></div>
 
-          <!-- Custody overlay animation -->
           <div class="custodyOverlay" id="custodyOverlay" aria-hidden="true">
-            <div class="barsFrame">
-              <div class="bars"></div>
-            </div>
+            <div class="barsFrame"><div class="bars"></div></div>
             <div class="custodyTag">Judicial Custody</div>
           </div>
 
@@ -832,7 +622,6 @@
         </div>
       </div>
 
-      <!-- Quiz panel (same screen for smartphone) -->
       <div class="quiz">
         <div class="quizTop">
           <div>
@@ -857,7 +646,6 @@
         </div>
       </div>
 
-      <!-- Verdict next screen -->
       <div class="verdictScreen" id="verdictScreen" role="dialog" aria-modal="true">
         <div class="verdictCard">
           <div class="verdictTop">
@@ -869,35 +657,31 @@
               <b>Points</b> <span id="verdictPoints">0</span>
             </div>
           </div>
-
           <div class="verdictBody">
             <div class="feedbackBox" id="verdictFeedback">Feedback appears here.</div>
           </div>
-
           <div class="verdictActions">
             <button class="btn primary" id="btnNext">Next Case</button>
           </div>
         </div>
       </div>
 
-      <!-- Intro overlay -->
       <div class="intro" id="intro">
         <div class="introCard">
           <div class="introTop">
             <h2>Bail or Custody</h2>
             <p>
-              You are the defence lawyer. Each hearing you get one MCQ based on the chapter.
-              Correct answer grants bail; wrong answer sends the client to custody. Aim for maximum bails.
+              You are the defence lawyer. Each hearing has one MCQ based on the chapter.
+              Correct grants bail; wrong sends the client to custody. Aim for maximum bails.
             </p>
           </div>
           <div class="introBody">
             <div class="ruleBox">
-              <b>Rules (v2)</b><br/>
+              <b>Rules</b><br/>
               • One attempt per question (no appeal).<br/>
               • Correct: +10 points and bail granted.<br/>
-              • Wrong: 0 points and judicial custody shown with an animation.<br/>
-              • Same-screen layout supports smartphones (scene on top, MCQ panel below).<br/>
-              • Game ends after a fixed number of cases (default 10).
+              • Wrong: 0 points and custody animation.<br/>
+              • Scene + MCQ stay on the same screen for smartphones.
             </div>
             <div class="ruleBox">
               <b>Teacher note</b><br/>
@@ -913,16 +697,13 @@
     </div>
   </div>
 
-  <div class="toast" id="toast">Saved</div>
+  <div class="toast" id="toast">OK</div>
 
   <script>
-    /***********************
-     * CONFIG
-     ***********************/
+    // ===== CONFIG =====
     const TOTAL_CASES = 10;
 
     // Replace with chapter-based MCQs.
-    // { id, topic, difficulty, brief, q, choices:[A,B,C,D], answerIndex (0..3), feedbackCorrect, feedbackWrong }
     const QUESTION_BANK = [
       {
         id: "CH-Q1",
@@ -955,38 +736,6 @@
         answerIndex: 1,
         feedbackCorrect: "Correct. Phishing is social engineering intended to deceive users into sharing credentials or sensitive data.",
         feedbackWrong: "Not correct. Phishing focuses on deception and information theft, not hardware damage or system upgrades."
-      },
-      {
-        id: "CH-Q3",
-        topic: "Controls",
-        difficulty: 2,
-        brief: "The judge asks what control best reduces harm if a password is compromised.",
-        q: "Which control most directly reduces the impact of a compromised password?",
-        choices: [
-          "Multi-factor authentication (MFA)",
-          "Defragmenting the hard disk",
-          "Increasing screen brightness",
-          "Turning off all firewalls"
-        ],
-        answerIndex: 0,
-        feedbackCorrect: "Correct. MFA adds an additional verification factor so a password alone is insufficient.",
-        feedbackWrong: "Not correct. The relevant idea is adding an extra factor beyond the password."
-      },
-      {
-        id: "CH-Q4",
-        topic: "Malware",
-        difficulty: 2,
-        brief: "A device was locked and access was demanded for payment. The judge asks the correct term.",
-        q: "Ransomware is best described as malware that:",
-        choices: [
-          "Steals data silently without any visible effects",
-          "Encrypts files and demands payment to restore access",
-          "Only affects mobile devices and not computers",
-          "Improves system security by patching vulnerabilities"
-        ],
-        answerIndex: 1,
-        feedbackCorrect: "Correct. Ransomware commonly encrypts files and demands payment for decryption.",
-        feedbackWrong: "Not correct. The defining behavior is encryption plus extortion."
       }
     ];
 
@@ -994,15 +743,14 @@
       "The accused requests bail. The prosecution claims a risk of repeating the offence.",
       "The accused is a first-time offender. The court seeks clarity on a relevant concept.",
       "Digital evidence is cited. You must respond using correct principles.",
-      "The judge asks a concept question to test your argument before granting bail.",
+      "The judge tests your reasoning before granting bail.",
       "A procedural concern is raised. Bail conditions must be justified with correct reasoning."
     ];
 
-    /***********************
-     * STATE
-     ***********************/
+    // ===== STATE =====
     const state = {
       totalCases: TOTAL_CASES,
+      started: false,
       index: 0,
       score: 0,
       bails: 0,
@@ -1011,55 +759,66 @@
       locked: false
     };
 
-    /***********************
-     * DOM
-     ***********************/
-    const el = (id) => document.getElementById(id);
+    // ===== DOM =====
+    const $ = (id) => document.getElementById(id);
+    function must(id){
+      const node = $(id);
+      if(!node) throw new Error("Missing element id: " + id);
+      return node;
+    }
 
-    const hudCase = el("hudCase");
-    const hudScore = el("hudScore");
-    const hudBails = el("hudBails");
+    const hudCase = must("hudCase");
+    const hudScore = must("hudScore");
+    const hudBails = must("hudBails");
 
-    const caseNo = el("caseNo");
-    const caseBrief = el("caseBrief");
+    const caseNo = must("caseNo");
+    const caseBrief = must("caseBrief");
 
-    const quizTitle = el("quizTitle");
-    const quizSub = el("quizSub");
+    const quizTitle = must("quizTitle");
+    const quizSub = must("quizSub");
 
-    const qText = el("qText");
-    const qMeta = el("qMeta");
-    const options = el("options");
+    const qText = must("qText");
+    const qMeta = must("qMeta");
+    const options = must("options");
 
-    const btnStart = el("btnStart");
-    const btnRestart = el("btnRestart");
-    const btnExport = el("btnExport");
+    const btnStart = must("btnStart");
+    const btnRestart = must("btnRestart");
+    const btnExport = must("btnExport");
 
-    const intro = el("intro");
-    const btnIntroStart = el("btnIntroStart");
+    const intro = must("intro");
+    const btnIntroStart = must("btnIntroStart");
 
-    const gavel = el("gavel");
-    const stamp = el("stamp");
-    const confetti = el("confetti");
+    const gavel = must("gavel");
+    const stamp = must("stamp");
+    const confetti = must("confetti");
 
-    const custodyOverlay = el("custodyOverlay");
-    const clientSvg = el("clientSvg");
+    const custodyOverlay = must("custodyOverlay");
+    const clientSvg = must("clientSvg");
 
-    const verdictScreen = el("verdictScreen");
-    const verdictTitle = el("verdictTitle");
-    const verdictLine = el("verdictLine");
-    const verdictPoints = el("verdictPoints");
-    const verdictFeedback = el("verdictFeedback");
-    const btnNext = el("btnNext");
+    const verdictScreen = must("verdictScreen");
+    const verdictTitle = must("verdictTitle");
+    const verdictLine = must("verdictLine");
+    const verdictPoints = must("verdictPoints");
+    const verdictFeedback = must("verdictFeedback");
+    const btnNext = must("btnNext");
 
-    const toast = el("toast");
+    const toast = must("toast");
 
-    /***********************
-     * HELPERS
-     ***********************/
+    // ===== HELPERS =====
     function showToast(msg){
       toast.textContent = msg;
       toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 1000);
+      setTimeout(() => toast.classList.remove("show"), 1100);
+    }
+
+    function escapeHTML(str){
+      const s = String(str);
+      return s
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
     }
 
     function tapGavel(){
@@ -1078,12 +837,14 @@
       clientSvg.style.opacity = "";
       clientSvg.style.transform = "";
       state.locked = false;
-      // clear option styles
-      [...options.querySelectorAll(".opt")].forEach(b=>{
+
+      const btns = options.querySelectorAll(".opt");
+      for(const b of btns){
         b.classList.remove("correct","wrong");
         b.disabled = false;
-        b.querySelector("small").textContent = "Tap to submit";
-      });
+        const sm = b.querySelector("small");
+        if(sm) sm.textContent = "Tap to submit";
+      }
     }
 
     function popStamp(isGood){
@@ -1096,10 +857,10 @@
       const pieces = 26;
       for(let i=0;i<pieces;i++){
         const p = document.createElement("i");
-        p.style.left = Math.random()*100 + "%";
+        p.style.left = (Math.random()*100) + "%";
         p.style.animationDelay = (Math.random()*0.12) + "s";
         const hue = Math.floor(Math.random()*360);
-        p.style.background = `hsla(${hue}, 85%, 65%, .95)`;
+        p.style.background = "hsla(" + hue + ", 85%, 65%, .95)";
         p.style.width = (8 + Math.random()*6) + "px";
         p.style.height = (10 + Math.random()*10) + "px";
         confetti.appendChild(p);
@@ -1108,30 +869,22 @@
       setTimeout(()=> confetti.classList.remove("show"), 1400);
     }
 
+    function showVerdictScreen(){ verdictScreen.classList.add("show"); }
+    function hideVerdictScreen(){ verdictScreen.classList.remove("show"); }
+
     function updateHUD(){
-      hudCase.textContent = `${Math.min(state.index+1, state.totalCases)} / ${state.totalCases}`;
-      hudScore.textContent = `${state.score}`;
-      hudBails.textContent = `${state.bails}`;
-    }
-
-    function escapeHTML(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function pickQuestion(){
-      // simple cycling sampler; replace with random/no-repeat if you expand the bank
-      const idx = state.index % QUESTION_BANK.length;
-      return QUESTION_BANK[idx];
+      const caseText = state.started ? ((state.index + 1) + " / " + state.totalCases) : ("0 / " + state.totalCases);
+      hudCase.textContent = caseText;
+      hudScore.textContent = String(state.score);
+      hudBails.textContent = String(state.bails);
     }
 
     function genBrief(){
-      const t = CASE_TEMPLATES[state.index % CASE_TEMPLATES.length];
-      return t;
+      return CASE_TEMPLATES[state.index % CASE_TEMPLATES.length];
+    }
+
+    function pickQuestion(){
+      return QUESTION_BANK[state.index % QUESTION_BANK.length];
     }
 
     function logAttempt(entry){
@@ -1149,40 +902,42 @@
       setTimeout(()=>URL.revokeObjectURL(a.href), 800);
     }
 
-    function showVerdictScreen(){
-      verdictScreen.classList.add("show");
-    }
-    function hideVerdictScreen(){
-      verdictScreen.classList.remove("show");
-    }
-
-    /***********************
-     * GAME FLOW
-     ***********************/
+    // ===== FLOW =====
     function resetGame(){
+      state.started = false;
       state.index = 0;
       state.score = 0;
       state.bails = 0;
       state.current = null;
       state.attemptLog = [];
+      state.locked = false;
+
       hideVerdictScreen();
-      updateHUD();
-      resetSceneFX();
       intro.style.display = "flex";
+
       quizTitle.textContent = "Ready";
       quizSub.textContent = "Start the hearings. One attempt per question.";
       qText.textContent = "Press “Start” to begin.";
       qMeta.textContent = "Topic: — • Difficulty: — • Question ID: —";
       options.innerHTML = "";
+
       btnStart.textContent = "Start";
+      btnStart.disabled = false;
+
+      caseNo.textContent = "Case #1";
+      caseBrief.textContent = "Case brief will appear here.";
+
+      updateHUD();
+      resetSceneFX();
     }
 
     function startGame(){
-      intro.style.display = "none";
+      state.started = true;
       state.index = 0;
       state.score = 0;
       state.bails = 0;
       state.attemptLog = [];
+      intro.style.display = "none";
       nextCase();
     }
 
@@ -1191,11 +946,10 @@
       resetSceneFX();
 
       if(state.index >= state.totalCases){
-        // end
         verdictTitle.textContent = "Session Complete";
-        verdictLine.textContent = `You secured ${state.bails} bails out of ${state.totalCases}.`;
-        verdictPoints.textContent = `${state.score}`;
-        verdictFeedback.textContent = "Export the log for research analysis, or restart to play again.";
+        verdictLine.textContent = "You secured " + state.bails + " bails out of " + state.totalCases + ".";
+        verdictPoints.textContent = String(state.score);
+        verdictFeedback.textContent = "Export the log for analysis, or restart to play again.";
         btnNext.textContent = "Restart";
         showVerdictScreen();
         return;
@@ -1204,24 +958,24 @@
       btnNext.textContent = "Next Case";
       state.current = pickQuestion();
 
-      // Scene labels
-      caseNo.textContent = `Case #${state.index+1}`;
+      caseNo.textContent = "Case #" + (state.index + 1);
       caseBrief.textContent = state.current.brief || genBrief();
 
-      // Quiz
       quizTitle.textContent = "Judge’s Question";
       quizSub.textContent = "Choose the best answer. One attempt only.";
       qText.textContent = state.current.q;
-      qMeta.textContent = `Topic: ${state.current.topic} • Difficulty: ${state.current.difficulty} • Question ID: ${state.current.id}`;
+      qMeta.textContent =
+        "Topic: " + state.current.topic +
+        " • Difficulty: " + state.current.difficulty +
+        " • Question ID: " + state.current.id;
 
-      // Render options
       options.innerHTML = "";
       const labels = ["A","B","C","D"];
       state.current.choices.forEach((c, idx)=>{
         const b = document.createElement("button");
         b.className = "opt";
         b.type = "button";
-        b.innerHTML = `<div><b>${labels[idx]}.</b> ${escapeHTML(c)}</div><small>Tap to submit</small>`;
+        b.innerHTML = "<div><b>" + labels[idx] + ".</b> " + escapeHTML(c) + "</div><small>Tap to submit</small>";
         b.addEventListener("click", () => submitAnswer(idx));
         options.appendChild(b);
       });
@@ -1236,28 +990,26 @@
       if(state.locked) return;
       state.locked = true;
 
-      // Lock all options immediately (one attempt)
-      const btns = [...options.querySelectorAll(".opt")];
-      btns.forEach(b=> b.disabled = true);
+      const btns = Array.from(options.querySelectorAll(".opt"));
+      btns.forEach(b => b.disabled = true);
 
       const correctIdx = state.current.answerIndex;
       const correct = selectedIndex === correctIdx;
 
-      // Mark answers
       btns.forEach((b, idx)=>{
         if(idx === correctIdx) b.classList.add("correct");
         if(idx === selectedIndex && idx !== correctIdx) b.classList.add("wrong");
         const sm = b.querySelector("small");
-        if(idx === correctIdx) sm.textContent = "Correct option";
-        else if(idx === selectedIndex) sm.textContent = "Your selection";
-        else sm.textContent = "Option";
+        if(sm){
+          if(idx === correctIdx) sm.textContent = "Correct option";
+          else if(idx === selectedIndex) sm.textContent = "Your selection";
+          else sm.textContent = "Option";
+        }
       });
 
-      // Scene FX + Next screen
       tapGavel();
 
       let points = 0;
-
       if(correct){
         points = 10;
         state.score += points;
@@ -1265,66 +1017,44 @@
 
         popStamp(true);
         fireConfetti();
-
-        // client "walk out" animation for bail
         setTimeout(()=> clientSvg.classList.add("walkOut"), 220);
 
         verdictTitle.textContent = "Bail Granted";
-        verdictLine.textContent = `Good argument. You earned ${points} points.`;
-        verdictPoints.textContent = `${points}`;
+        verdictLine.textContent = "Good argument. You earned " + points + " points.";
+        verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackCorrect;
-
-        logAttempt({
-          caseNo: state.index+1,
-          qid: state.current.id,
-          topic: state.current.topic,
-          difficulty: state.current.difficulty,
-          selectedIndex,
-          correctIndex: correctIdx,
-          correct: true,
-          pointsAwarded: points
-        });
-
-        updateHUD();
-
-        // Show next screen after a short beat
-        setTimeout(()=> showVerdictScreen(), 850);
-
       } else {
         points = 0;
-
         popStamp(false);
-
-        // custody animation overlay
-        setTimeout(()=>{
-          custodyOverlay.classList.add("show");
-        }, 180);
+        setTimeout(()=> custodyOverlay.classList.add("show"), 180);
 
         verdictTitle.textContent = "Judicial Custody";
         verdictLine.textContent = "Bail denied due to incorrect reasoning.";
-        verdictPoints.textContent = `${points}`;
+        verdictPoints.textContent = String(points);
         verdictFeedback.textContent = state.current.feedbackWrong;
-
-        logAttempt({
-          caseNo: state.index+1,
-          qid: state.current.id,
-          topic: state.current.topic,
-          difficulty: state.current.difficulty,
-          selectedIndex,
-          correctIndex: correctIdx,
-          correct: false,
-          pointsAwarded: points
-        });
-
-        updateHUD();
-
-        setTimeout(()=> showVerdictScreen(), 850);
       }
+
+      logAttempt({
+        caseNo: state.index + 1,
+        qid: state.current.id,
+        topic: state.current.topic,
+        difficulty: state.current.difficulty,
+        selectedIndex,
+        correctIndex: correctIdx,
+        correct,
+        pointsAwarded: points
+      });
+
+      updateHUD();
+      setTimeout(()=> showVerdictScreen(), 850);
     }
 
     function goNext(){
+      if(!state.started){
+        showToast("Click Start Hearings first");
+        return;
+      }
       if(state.index >= state.totalCases){
-        // finished -> restart
         resetGame();
         return;
       }
@@ -1336,31 +1066,27 @@
       const payload = {
         meta: {
           game: "Courtroom Bail GBL",
-          version: "v2 (single-screen + verdict screen + one attempt)",
+          version: "v2.1 (robust init + safe escape + one attempt)",
           totalCases: state.totalCases,
           exportedAt: new Date().toISOString()
         },
-        results: {
-          score: state.score,
-          bails: state.bails
-        },
+        results: { score: state.score, bails: state.bails },
         attempts: state.attemptLog
       };
-      downloadJSON(`courtroom_bail_gbl_log_${Date.now()}.json`, payload);
+      downloadJSON("courtroom_bail_gbl_log_" + Date.now() + ".json", payload);
       showToast("Log exported");
     }
 
-    /***********************
-     * EVENTS
-     ***********************/
+    // ===== EVENTS =====
     btnIntroStart.addEventListener("click", startGame);
     btnStart.addEventListener("click", startGame);
     btnNext.addEventListener("click", goNext);
     btnRestart.addEventListener("click", resetGame);
     btnExport.addEventListener("click", exportLog);
 
-    // init
+    // ===== INIT =====
     resetGame();
+    showToast("JS Loaded");
   </script>
 </body>
 </html>
